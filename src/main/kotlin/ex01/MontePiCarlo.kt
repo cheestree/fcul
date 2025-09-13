@@ -9,6 +9,9 @@ import kotlin.random.Random
 private typealias Point = Pair<Double, Double>
 
 private fun circleCenter(p1: Point, p2: Point): Pair<Double, Double> {
+    require(p1 != p2) { "Points must not be identical" }
+    require(p1.first.isFinite() && p1.second.isFinite() &&
+            p2.first.isFinite() && p2.second.isFinite()) { "Coordinates must be finite numbers" }
     return Point((p1.first + p2.first) / 2, (p1.second + p2.second) / 2)
 }
 
@@ -59,19 +62,4 @@ fun montePiCarloParallel(radius: Int, vertices: Pair<Point, Point>, samples: Int
     pool.awaitTermination(1, TimeUnit.MINUTES)
 
     return 4.0 * inside.get() / samples
-}
-
-fun main() {
-    val r = 1
-    val vertices = Pair(Pair(-1.0, -1.0), Pair(1.0, 1.0))
-    val samples = 1_000_000
-
-    val nThreads = 4
-    val chunkSize = 1000
-
-    val piSequential = montePiCarloSequential(r, vertices, samples)
-    val piParallel = montePiCarloParallel(r, vertices, samples, nThreads, chunkSize)
-
-    println(piSequential)
-    println(piParallel)
 }

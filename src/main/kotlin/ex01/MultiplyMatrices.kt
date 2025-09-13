@@ -8,17 +8,14 @@ fun checkValidMatrix(m1: List<List<Int>>): Boolean {
     return m1.all { row -> mainRow == row.size }
 }
 
-fun checkValidMatricesCombination(m1: List<List<Int>>, m2: List<List<Int>>) =
-    m1.first().size == m2.size
-
-fun checkValidMultiplication(m1: List<List<Int>>, m2: List<List<Int>>): Boolean {
-    return checkValidMatrix(m1) &&
-            checkValidMatrix(m2) &&
-            checkValidMatricesCombination(m1, m2)
+fun checkValidMultiplication(m1: List<List<Int>>, m2: List<List<Int>>) {
+    require(checkValidMatrix(m1)) { "Invalid matrix m1" }
+    require(checkValidMatrix(m2)) { "Invalid matrix m2" }
+    require(m1.first().size == m2.size) { "Invalid matrix dimensions for multiplication" }
 }
 
 fun multiplyMatricesSequential(m1: List<List<Int>>, m2: List<List<Int>>): Array<Array<Int>> {
-    require(checkValidMultiplication(m1, m2)) { "Invalid matrix" }
+    checkValidMultiplication(m1, m2)
 
     val rows = m1.size
     val cols = m2.first().size
@@ -42,7 +39,7 @@ fun multiplyMatricesParallel(
     nThreads: Int,
     chunkSize: Int
 ): Array<Array<Int>> {
-    require(checkValidMultiplication(m1, m2)) { "Invalid matrix" }
+    checkValidMultiplication(m1, m2)
 
     val rows = m1.size
     val cols = m2.first().size
@@ -69,18 +66,4 @@ fun multiplyMatricesParallel(
     pool.awaitTermination(1, TimeUnit.MINUTES)
 
     return result
-}
-
-fun main(){
-    val m1 = listOf(listOf(1, 2), listOf(3, 4)) //  2×2
-    val m2 = listOf(listOf(5, 6), listOf(7, 8)) //  2×2
-
-    val nThreads = 4
-    val chunkSize = 2
-
-    val multipliedSequential = multiplyMatricesSequential(m1, m2)
-    val multipliedParallel = multiplyMatricesParallel(m1, m2, nThreads, chunkSize)
-
-    println(multipliedSequential.contentDeepToString())
-    println(multipliedParallel.contentDeepToString())
 }
