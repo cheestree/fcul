@@ -1,6 +1,7 @@
 package benchmarks.ex01
 
 import org.cheese.ex01.trapezoidsRuleParallelSafe
+import org.cheese.ex01.trapezoidsRuleParallelSafeMW
 import org.cheese.ex01.trapezoidsRuleSequential
 import org.openjdk.jmh.annotations.Benchmark
 import org.openjdk.jmh.annotations.BenchmarkMode
@@ -65,4 +66,15 @@ open class TrapezoidsRuleBenchmark {
     @BenchmarkMode(Mode.AverageTime)
     fun parallelAvgTime(): Float =
         trapezoidsRuleParallelSafe(f, lowerBound, upperBound, resolution, chunkSize)
+
+    //  Master/Worker
+    @Benchmark
+    @BenchmarkMode(Mode.Throughput)
+    fun parallelThroughputMW(): Float =
+        trapezoidsRuleParallelSafeMW(f, lowerBound, upperBound, resolution, chunkSize)
+
+    @Benchmark
+    @BenchmarkMode(Mode.AverageTime)
+    fun parallelAvgTimeMW(): Float =
+        trapezoidsRuleParallelSafeMW(f, lowerBound, upperBound, resolution, chunkSize)
 }

@@ -10,9 +10,9 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
 class MultiplyMatricesTest {
-    private val m1 = listOf(listOf(1, 2), listOf(3, 4)) //  2×2
-    private val m2 = listOf(listOf(5, 6), listOf(7, 8)) //  2×2
-    private val m3 = listOf(listOf(1, 2), listOf(3, 4), listOf(5, 6)) //  3×3
+    private val m1 = arrayOf(intArrayOf(1, 2), intArrayOf(3, 4)) //  2×2
+    private val m2 = arrayOf(intArrayOf(5, 6), intArrayOf(7, 8)) //  2×2
+    private val m3 = arrayOf(intArrayOf(1, 2), intArrayOf(3, 4), intArrayOf(5, 6)) //  3×3
 
     private val nThreads = 4
     private val chunkSize = 2

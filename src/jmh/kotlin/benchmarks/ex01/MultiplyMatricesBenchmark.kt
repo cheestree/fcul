@@ -25,8 +25,8 @@ import kotlin.random.Random
 @State(Scope.Thread)
 open class MultiplyMatricesBenchmark {
 
-    private lateinit var m1: List<List<Int>>
-    private lateinit var m2: List<List<Int>>
+    private lateinit var m1: Array<IntArray>
+    private lateinit var m2: Array<IntArray>
 
     @Param("2", "100", "500", "1000")
     var size: Int = 0
@@ -36,29 +36,40 @@ open class MultiplyMatricesBenchmark {
 
     @Setup(Level.Iteration)
     fun setup() {
-        m1 = List(size) { List(size) { Random.Default.nextInt(0, 10) } }
-        m2 = List(size) { List(size) { Random.Default.nextInt(0, 10) } }
+        m1 = Array(size) { IntArray(size) { Random.Default.nextInt(0, 10) } }
+        m2 = Array(size) { IntArray(size) { Random.Default.nextInt(0, 10) } }
     }
 
     //  Sequential
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    fun sequentialThroughput(): Array<Array<Int>> =
+    fun sequentialThroughput(): Array<IntArray> =
         multiplyMatricesSequential(m1, m2)
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
-    fun sequentialAvgTime(): Array<Array<Int>> =
+    fun sequentialAvgTime(): Array<IntArray> =
         multiplyMatricesSequential(m1, m2)
 
     //  Parallel
     @Benchmark
     @BenchmarkMode(Mode.Throughput)
-    fun parallelThroughput(): Array<Array<Int>> =
+    fun parallelThroughput(): Array<IntArray> =
         multiplyMatricesParallel(m1, m2, Runtime.getRuntime().availableProcessors(), chunkSize)
 
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
-    fun parallelAvgTime(): Array<Array<Int>> =
+    fun parallelAvgTime(): Array<IntArray> =
+        multiplyMatricesParallel(m1, m2, Runtime.getRuntime().availableProcessors(), chunkSize)
+
+    //  Master/Worker
+    @Benchmark
+    @BenchmarkMode(Mode.Throughput)
+    fun parallelThroughputMW(): Array<IntArray> =
+        multiplyMatricesParallel(m1, m2, Runtime.getRuntime().availableProcessors(), chunkSize)
+
+    @Benchmark
+    @BenchmarkMode(Mode.AverageTime)
+    fun parallelAvgTimeMW(): Array<IntArray> =
         multiplyMatricesParallel(m1, m2, Runtime.getRuntime().availableProcessors(), chunkSize)
 }

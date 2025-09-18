@@ -1,18 +1,28 @@
 package org.cheese.ex01
 
+import org.cheese.common.Master
+import org.cheese.common.Task
 import java.util.concurrent.Executors
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.DoubleAdder
 
 
 fun checkValidTrapezoid(
-    a: Double, b: Double, h: Double,
+    a: Double,
+    b: Double,
+    h: Double,
 ) {
     require(a < b) { "Bounds must be positive." }
     require(h > 0) { "Resolution must be positive." }
 }
 
-fun trapezoidsRuleSequential(f: (Double) -> Double, a: Double, b: Double, h: Double): Float {
+fun trapezoidsRuleSequential(
+    f: (Double) -> Double,
+    a: Double,
+    b: Double,
+    h: Double
+): Float {
     checkValidTrapezoid(a, b, h)
 
     val n = ((b - a) / h).toInt()
@@ -20,7 +30,13 @@ fun trapezoidsRuleSequential(f: (Double) -> Double, a: Double, b: Double, h: Dou
     return (h * (0.5 * (f(a) + f(b)) + sum)).toFloat()
 }
 
-fun trapezoidsRuleParallelUnsafe(f: (Double) -> Double, a: Double, b: Double, h: Double, nThreads: Int = 4): Float {
+fun trapezoidsRuleParallelUnsafe(
+    f: (Double) -> Double,
+    a: Double,
+    b: Double,
+    h: Double,
+    nThreads: Int = Runtime.getRuntime().availableProcessors(),
+): Float {
     checkValidTrapezoid(a, b, h)
 
     val n = ((b - a) / h).toInt()
@@ -66,6 +82,38 @@ fun trapezoidsRuleParallelSafe(
 
     pool.shutdown()
     pool.awaitTermination(1, TimeUnit.MINUTES)
+
+    return (h * (0.5 * (f(a) + f(b)) + sum.toDouble())).toFloat()
+}
+
+fun trapezoidsRuleParallelSafeMW(
+    f: (Double) -> Double,
+    a: Double,
+    b: Double,
+    h: Double,
+    nThreads: Int = Runtime.getRuntime().availableProcessors(),
+    chunkSize: Int = ((b - a) / h).toInt() / nThreads
+): Float {
+    checkValidTrapezoid(a, b, h)
+
+    val n = ((b - a) / h).toInt()
+    val sum = DoubleAdder()
+    val tasks = LinkedBlockingQueue<Task>()
+
+    (1 until n).chunked(chunkSize).forEach { chunk ->
+        tasks += Task({
+            var localSum = 0.0
+            for (i in chunk) {
+                localSum += f(a + i * h)
+            }
+            sum.add(localSum)
+        })
+    }
+
+    val master = Master(nThreads, tasks)
+
+    master.killThreads()
+    master.joinThreads()
 
     return (h * (0.5 * (f(a) + f(b)) + sum.toDouble())).toFloat()
 }

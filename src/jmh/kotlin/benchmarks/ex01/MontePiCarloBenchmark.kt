@@ -1,6 +1,7 @@
 package benchmarks.ex01
 
 import org.cheese.ex01.montePiCarloParallel
+import org.cheese.ex01.montePiCarloParallelMW
 import org.cheese.ex01.montePiCarloSequential
 import org.openjdk.jmh.annotations.*
 import java.util.concurrent.TimeUnit
@@ -55,5 +56,16 @@ open class MontePiCarloBenchmark {
     @BenchmarkMode(Mode.AverageTime)
     fun parallelAvgTime(): Double =
         montePiCarloParallel(radius, vertices, samples, nThreads, chunkSize)
+
+    //  Master/Worker
+    @Benchmark
+    @BenchmarkMode(Mode.Throughput)
+    fun parallelThroughputMW(): Double =
+        montePiCarloParallelMW(radius, vertices, samples, nThreads, chunkSize)
+
+    @Benchmark
+    @BenchmarkMode(Mode.AverageTime)
+    fun parallelAvgTimeMW(): Double =
+        montePiCarloParallelMW(radius, vertices, samples, nThreads, chunkSize)
 
 }

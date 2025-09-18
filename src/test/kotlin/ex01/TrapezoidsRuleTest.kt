@@ -1,6 +1,5 @@
 package ex01
 
-import org.cheese.ex01.checkValidMultiplication
 import org.cheese.ex01.trapezoidsRuleParallelSafe
 import org.cheese.ex01.trapezoidsRuleSequential
 import org.junit.jupiter.api.Test
