@@ -2,6 +2,7 @@ package ex01
 
 import org.cheese.ex01.checkValidMultiplication
 import org.cheese.ex01.multiplyMatricesParallel
+import org.cheese.ex01.multiplyMatricesParallelMW
 import org.cheese.ex01.multiplyMatricesSequential
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -46,6 +47,16 @@ class MultiplyMatricesTest {
 
         assertEquals(
             multiplyMatricesParallel(m1, m2, nThreads, chunkSize).contentDeepToString(),
+            result.contentDeepToString()
+        )
+    }
+
+    @Test
+    fun `should succeed when multiplying matrices (master-worker)`() {
+        val result = arrayOf(arrayOf(19, 22), arrayOf(43, 50))
+
+        assertEquals(
+            multiplyMatricesParallelMW(m1, m2, nThreads, chunkSize).contentDeepToString(),
             result.contentDeepToString()
         )
     }
