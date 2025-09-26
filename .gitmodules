@@ -1,0 +1,3 @@
+[submodule "cm/assignments/BusinessCard"]
+	path = cm/assignments/BusinessCard
+	url = git@github.com:cheestree/BusinessCard
