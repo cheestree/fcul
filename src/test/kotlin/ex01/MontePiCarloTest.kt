@@ -1,6 +1,8 @@
 package ex01
 
 import org.cheese.ex01.montePiCarloParallel
+import org.cheese.ex01.montePiCarloParallelMW
+import org.cheese.ex01.montePiCarloParallelStream
 import org.cheese.ex01.montePiCarloSequential
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.assertThrows
@@ -33,6 +35,22 @@ class MontePiCarloTest {
     @Test
     fun `should reasonably approximate pi value (parallel)`() {
         val piEstimate = montePiCarloParallel(r, vertices, samples, nThreads, chunkSize)
+
+        assertTrue(piEstimate in 3.13..3.15) // Allow a reasonable tolerance
+    }
+
+    @Test
+    fun `should reasonably approximate pi value (master-worker)`() {
+        val piEstimate = montePiCarloParallelMW(r, vertices, samples, nThreads, chunkSize)
+
+        assertTrue(piEstimate in 3.13..3.15) // Allow a reasonable tolerance
+    }
+
+    @Test
+    fun `should reasonably approximate pi value (parallel stream)`() {
+        val piEstimate = montePiCarloParallelStream(r, vertices, samples)
+
+        println(piEstimate)
 
         assertTrue(piEstimate in 3.13..3.15) // Allow a reasonable tolerance
     }

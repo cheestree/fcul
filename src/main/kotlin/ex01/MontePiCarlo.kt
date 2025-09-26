@@ -6,6 +6,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.stream.IntStream
 import kotlin.math.pow
 import kotlin.random.Random
 
@@ -115,4 +116,30 @@ fun montePiCarloParallelMW(
     master.joinThreads()
 
     return 4.0 * inside.get() / samples
+}
+
+
+//  The sequential version using the Java Stream API is the same as using the Kotlin lists. They
+//  are sequential by default, and need to explicitly be parallelized with the parallel() method.
+
+//  In Java, it's the same as the Parallel version, just without the parallel() method.
+
+fun montePiCarloParallelStream(
+    radius: Int,
+    vertices: Pair<Point, Point>,
+    samples: Int
+): Double {
+    val center = circleCenter(vertices.first, vertices.second)
+    val radiusSquared = radius * radius
+    val inside = IntStream.range(0, samples).parallel()
+        .map { _ ->
+            val x = Random.nextDouble(vertices.first.first, vertices.second.first)
+            val y = Random.nextDouble(vertices.first.second, vertices.second.second)
+
+            if (squaredDistance(center, Point(x, y)) <= radiusSquared) 1 else 0
+        }
+        .reduce(0) { acc, value -> acc + value }
+
+
+    return 4.0 * inside / samples
 }
