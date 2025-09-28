@@ -22,7 +22,7 @@ def map_dtype_to_mysql(dtype):
         return "VARCHAR(255)"
 
 def createColumns(csv: pd.DataFrame):
-    columns = []
+    columns = ['id INT AUTO_INCREMENT PRIMARY KEY']
     for col, dtype in csv.dtypes.items():
         sql_type = map_dtype_to_mysql(dtype)
         columns.append(f"`{col}` {sql_type}")
@@ -130,13 +130,13 @@ def main():
     columns = createColumns(csv)
     createTable(cursor, "star_clusters", columns)
 
+    #   Exercise 3
+    insertRow(cursor, "star_clusters", csv.head(1))
+
     #   Exercise 4
     #   insertMultipleRows(cursor, "star_clusters", "dias_catalogue.csv")
     insertMultipleRows(cursor, "star_clusters", csv)
     connection.commit()
-
-    #   Exercise 3
-    insertRow(cursor, "star_clusters", csv.head(1))
 
     #   Exercise 5
     selectRows(cursor, "star_clusters", "DiamMax_pc", 20)
