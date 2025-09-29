@@ -25,7 +25,7 @@ def aggregate(csv: pd.DataFrame, column: str, threshold: int):
     avg = filtered[column].mean()
     print(avg)
 
-def groupingCounting(csv: pd.DataFrame, conditions):
+def groupingCounting(csv: pd.DataFrame, conditions: pd.Series):
     filtered = csv[conditions]
     count = filtered.count
     print(count)
@@ -34,18 +34,23 @@ def main():
     csv = readCSV("dias_catalogue.csv")
 
     #   Exercise 1
+    print("Exercise 1")
     selectColumns(csv, ['name', 'RA_ICRS', 'DE_ICRS', 'Vr', 'Plx'])
 
     #   Exercise 2
+    print("Exercise 2")
     filterRowsByAge(csv, 1)
 
     #   Exercise 3
+    print("Exercise 3")
     sortBy(csv, 'Plx', 10)
 
     #   Exercise 4
+    print("Exercise 4")
     aggregate(csv, 'FeH', 10)
 
     #   Exercise 5
+    print("Exercise 5")
     groupingCounting(csv, (csv['flagdispPM'] == 1) & (csv['sigPM'] > 2))
 
 if __name__ == "__main__":

@@ -1,39 +1,56 @@
 import numpy as np
 import pandas as pd
-from sqlalchemy import create_engine, text
+from sqlalchemy import Connection, create_engine, text
 
 
-def clusterSizeAndExtent(conn):
+def clusterSizeAndExtent(conn: Connection):
     query = text("""SELECT name, Diam_pc, dist_iso FROM star_clusters ORDER BY Diam_pc DESC LIMIT 5;""")
     results = conn.execute(query).fetchall()
     for row in results:
-        print(row)
+        pass
+        #   print(row)
+    print(len(results))
 
-def motionAnalysis(conn):
+def motionAnalysis(conn: Connection):
     query = text("""SELECT avg(pmRA), avg(pmDE) FROM star_clusters WHERE Plx > 1;""")
     results = conn.execute(query).fetchall()
     for row in results:
-        print(row)
+        pass
+        #   print(row)
+    if results:
+        avg_pmra, avg_pmde = results[0][0], results[0][1]
+        print(avg_pmra, avg_pmde)
+    else:
+        print(0)
 
-def distanceCmparison(conn):
-    query = text("""SELECT * FROM star_clusters WHERE dist_iso - dist_PLX > 500;""")
+def distanceCmparison(conn: Connection):
+    query = text("""SELECT * FROM star_clusters WHERE abs(dist_iso - dist_PLX) > 500;""")
     results = conn.execute(query).fetchall()
     for row in results:
-        print(row)
+        pass
+        #   print(row)
+    print(len(results))
 
-def ageAndMetallicity(conn):
+def ageAndMetallicity(conn: Connection):
     query = text("""SELECT avg(FeH) FROM star_clusters WHERE age > 2;""")
     results = conn.execute(query).fetchall()
     for row in results:
-        print(row)
+        pass
+        #   print(row)
+    if results:
+        print(results[0][0])
+    else:
+        print(0)
 
-def filteringByDataQuality(conn):
+def filteringByDataQuality(conn: Connection):
     query = text("""SELECT name, Plx, sigPM, e_Plx FROM star_clusters WHERE sigPM < 0.5 AND e_Plx < 0.2;""")
     results = conn.execute(query).fetchall()
     for row in results:
-        print(row)
+        pass
+        #   print(row)
+    print(len(results))
 
-def query_cluster_by_name(conn, cluster_name: str):
+def query_cluster_by_name(conn: Connection, cluster_name: str):
     query = text("""SELECT * FROM star_clusters WHERE name = :name;""")
     result = pd.read_sql_query(query, conn, params={"name": cluster_name})
     print(result)

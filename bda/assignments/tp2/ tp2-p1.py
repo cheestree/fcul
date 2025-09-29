@@ -43,18 +43,18 @@ def createDatabase(cursor: MySQLCursorAbstract, database: str):
     cursor.execute(f"CREATE DATABASE IF NOT EXISTS {database}")
     cursor.execute(f"USE {database}")
 
-def createTable(cursor: MySQLCursorAbstract, table: str, columns: str):
+def createTable(cursor: MySQLCursorAbstract, columns: str, table: str = "star_clusters"):
     cursor.execute(f"DROP TABLE IF EXISTS {table}")
     cursor.execute(f"CREATE TABLE {table} ({columns})")
 
-def insertRow(cursor: MySQLCursorAbstract, table: str, df: pd.DataFrame):
+def insertRow(cursor: MySQLCursorAbstract, df: pd.DataFrame, table: str = "star_clusters"):
     cols = ", ".join([f"`{col}`" for col in df.columns])
     placeholders = ", ".join(["%s"] * len(df.columns))
     sql = f"INSERT INTO {table} ({cols}) VALUES ({placeholders})"
     values = tuple(x.item() if hasattr(x, "item") else x for x in df.iloc[0])
     cursor.execute(sql, values)
 
-def insertMultipleRows(cursor: MySQLCursorAbstract, table: str, csv: pd.DataFrame):
+def insertMultipleRows(cursor: MySQLCursorAbstract, csv: pd.DataFrame, table: str = "star_clusters"):
     cols = ", ".join([f"`{col}`" for col in csv.columns])
     placeholders = ", ".join(["%s"] * len(csv.columns))
     sql = f"INSERT INTO {table} ({cols}) VALUES ({placeholders})"
@@ -75,36 +75,39 @@ def insertMultipleRows(cursor: MySQLCursorAbstract, table: str, file: str):
     cursor.execute(sql)
 '''
 
-def selectRows(cursor: MySQLCursorAbstract, table: str, column: str, threshold: int):
+def selectRows(cursor: MySQLCursorAbstract, column: str, threshold: int, table: str = "star_clusters"):
     sql = f"SELECT * FROM {table} WHERE {column} > %s"
     cursor.execute(sql, (threshold,))
     for row in cursor.fetchall():
-        print(row)
+        pass
+        #   print(row)
+    print(len(cursor.fetchall()))
 
-def selectSpecificColumns(cursor: MySQLCursorAbstract, table: str):
-    cursor.execute(f"SELECT name, RA_ICRS, DE_ICRS, Diam_pc FROM {table} WHERE Plx > %s", (1,))
+def selectSpecificColumns(cursor: MySQLCursorAbstract, table: str = "star_clusters", columns: list[str] = ['name', 'RA_ICRS', 'DE_ICRS', 'Diam_pc']):
+    cursor.execute(f"SELECT {", ".join(columns)} FROM {table} WHERE Plx > %s", (1,))
     for row in cursor.fetchall():
-        print(row)
+        pass
+        #   print(row)
+    print(len(cursor.fetchall()))
 
-def updateAgeOfSpecificRowBasedOnName(cursor: MySQLCursorAbstract, name: str, age: int):
-    cursor.execute("UPDATE star_clusters SET age = %s WHERE name = %s", (age, name,))
-    count = cursor.rowcount
-    print(count)
+def updateAgeOfSpecificRowBasedOnName(cursor: MySQLCursorAbstract, name: str, age: int, table: str = "star_clusters"):
+    cursor.execute(f"UPDATE {table} SET age = %s WHERE name = %s", (age, name,))
+    print(cursor.rowcount)
 
-def deleteRow(cursor: MySQLCursorAbstract, table: str, name: str):
+def deleteRow(cursor: MySQLCursorAbstract, name: str, table: str = "star_clusters"):
     cursor.execute(f"DELETE FROM {table} WHERE name = %s", (name,))
-    count = cursor.rowcount
-    print(count)
+    print(cursor.rowcount)
 
-def findByName(cursor: MySQLCursorAbstract, table: str, name: str):
-    cursor.execute(f"SELECT name, dist_PLX FROM {table} WHERE name LIKE %s", (f"%{name}%",))
+def findByName(cursor: MySQLCursorAbstract, name: str, columns: list[str] = ['name', 'dist_PLX'], table: str = "star_clusters"):
+    cursor.execute(f"SELECT {", ".join(columns)} FROM {table} WHERE name LIKE %s", (f"%{name}%",))
     for row in cursor.fetchall():
-        print(row)
+        pass
+        #   print(row)
+    print(len(cursor.fetchall()))
 
-def aggregateFunction(cursor: MySQLCursorAbstract, table: str):
+def aggregateFunction(cursor: MySQLCursorAbstract, table: str = "star_clusters"):
     cursor.execute(f"SELECT count(*) FROM {table} WHERE FeH < 0")
-    result = cursor.fetchone()
-    print(result[0])
+    print(cursor.fetchone()[0])
 
 
 #   NaN values are replaced with None to be compatible with MySQL.
@@ -121,45 +124,51 @@ def main():
     csv = csv.replace([np.nan, np.inf, -np.inf], None)
 
     #   Exercise 1
-    connection = createConnection("localhost", "root", "root")
-    cursor = connection.cursor()
+    print("Exercise 1")
+    with createConnection("localhost", "root", "root") as connection:
+        with connection.cursor() as cursor:
+            createDatabase(cursor, "astronomy_db")
+            
+            #   Exercise 2
+            print("Exercise 2")
+            columns = createColumns(csv)
+            createTable(cursor, columns)
 
-    createDatabase(cursor, "astronomy_db")
-    
-    #   Exercise 2
-    columns = createColumns(csv)
-    createTable(cursor, "star_clusters", columns)
+            #   Exercise 3
+            print("Exercise 3")
+            insertRow(cursor, csv.head(1))
 
-    #   Exercise 3
-    insertRow(cursor, "star_clusters", csv.head(1))
+            #   Exercise 4
+            print("Exercise 4")
+            #   insertMultipleRows(cursor, "star_clusters", "dias_catalogue.csv")
+            insertMultipleRows(cursor, csv)
+            connection.commit()
 
-    #   Exercise 4
-    #   insertMultipleRows(cursor, "star_clusters", "dias_catalogue.csv")
-    insertMultipleRows(cursor, "star_clusters", csv)
-    connection.commit()
+            #   Exercise 5
+            print("Exercise 5")
+            selectRows(cursor, "DiamMax_pc", 20)
 
-    #   Exercise 5
-    selectRows(cursor, "star_clusters", "DiamMax_pc", 20)
+            #   Exercise 6
+            print("Exercise 6")
+            selectSpecificColumns(cursor)
 
-    #   Exercise 6
-    selectSpecificColumns(cursor, "star_clusters")
+            #   Exercise 7
+            print("Exercise 7")
+            updateAgeOfSpecificRowBasedOnName(cursor, "NGC_188", 999)
+            connection.commit()
 
-    #   Exercise 7
-    updateAgeOfSpecificRowBasedOnName(cursor, "NGC_188", 999)
-    connection.commit()
+            #   Exercise 8
+            print("Exercise 8")
+            deleteRow(cursor, "NGC_188")
+            connection.commit()
 
-    #   Exercise 8
-    deleteRow(cursor, "star_clusters", "NGC_188")
-    connection.commit()
+            #   Exercise 9
+            print("Exercise 9")
+            findByName(cursor, "NGC")
 
-    #   Exercise 9
-    findByName(cursor, "star_clusters", "NGC")
-
-    #   Exercise 10
-    aggregateFunction(cursor, "star_clusters")
-
-    cursor.close()
-    connection.close()
+            #   Exercise 10
+            print("Exercise 10")
+            aggregateFunction(cursor)
 
 if __name__ == "__main__":
     main()
