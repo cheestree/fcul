@@ -1,14 +1,14 @@
 import mysql.connector
-from mysql.connector.cursor import MySQLCursorAbstract
 import numpy as np
 import pandas as pd
+from mysql.connector.cursor import MySQLCursorAbstract
+
 
 def readCSV(file_name: str):
     try:
         csv = pd.read_csv(file_name)
     except Exception as e:
-        print(f"Error loading file: {e}")
-        return
+        raise Exception(f"Error loading file {e}")
     return csv
 
 def map_dtype_to_mysql(dtype):

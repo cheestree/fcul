@@ -5,13 +5,12 @@ def readCSV(file_name: str):
     try:
         csv = pd.read_csv(file_name)
     except Exception as e:
-        print(f"Error loading file: {e}")
-        return
+        raise Exception(f"Error loading file {e}")
     return csv
 
 def selectColumns(csv: pd.DataFrame, columns: list[str]):
-    columns = csv[columns]
-    print(columns)
+    selectedColumns = csv[columns]
+    print(selectedColumns)
 
 def filterRowsByAge(csv: pd.DataFrame, threshold: int):
     rows = csv[csv['age'] > threshold]
@@ -34,10 +33,19 @@ def groupingCounting(csv: pd.DataFrame, conditions):
 def main():
     csv = readCSV("dias_catalogue.csv")
 
+    #   Exercise 1
     selectColumns(csv, ['name', 'RA_ICRS', 'DE_ICRS', 'Vr', 'Plx'])
+
+    #   Exercise 2
     filterRowsByAge(csv, 1)
+
+    #   Exercise 3
     sortBy(csv, 'Plx', 10)
+
+    #   Exercise 4
     aggregate(csv, 'FeH', 10)
+
+    #   Exercise 5
     groupingCounting(csv, (csv['flagdispPM'] == 1) & (csv['sigPM'] > 2))
 
 if __name__ == "__main__":

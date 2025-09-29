@@ -1,5 +1,6 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 
 def main1():
     print("Welcome to the CSV Data CLI!")
@@ -88,7 +89,7 @@ def filtering(csv: pd.DataFrame, columns: list[str] = ["name", "Plx", "dist_PLX"
     print(filtered[columns])
     print(f"Total columns: {length}")
 
-def sorting(csv: pd.DataFrame, sortBy: str, length: int = 5):
+def sorting(csv: pd.DataFrame, sortBy: list[str], length: int = 5):
     sorted = csv.sort_values(sortBy)
     firstFive = sorted.head(length)
     print(firstFive)
