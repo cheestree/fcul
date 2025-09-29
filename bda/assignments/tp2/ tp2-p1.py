@@ -119,7 +119,7 @@ def aggregateFunction(cursor: MySQLCursorAbstract, table: str = "star_clusters")
 #   
 #   None, as a value, is represented by Null in the database, since NaN isn't supported.
 def main():
-    csv = readCSV("dias_catalogue.csv")
+    csv = readCSV("../dias_catalogue.csv")
     csv = csv.replace('', None)
     csv = csv.replace([np.nan, np.inf, -np.inf], None)
 

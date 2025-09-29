@@ -31,7 +31,7 @@ def groupingCounting(csv: pd.DataFrame, conditions: pd.Series):
     print(count)
 
 def main():
-    csv = readCSV("dias_catalogue.csv")
+    csv = readCSV("../dias_catalogue.csv")
 
     #   Exercise 1
     print("Exercise 1")

@@ -3,7 +3,7 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 
 # Load CSV
-df = pd.read_csv("dias_catalogue.csv")
+df = pd.read_csv("../dias_catalogue.csv")
 
 # clean the dataset
 df = df.replace('', None)

@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 
 def main():
-    csv = pd.read_csv('dias_catalogue.csv')
+    csv = pd.read_csv('../dias_catalogue.csv')
     
     filtered = filterData(csv)
     createdAgeBins = createAgeBins(filtered)

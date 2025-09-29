@@ -4,7 +4,7 @@ import pandas as pd
 
 def main():
     print("Welcome to the CSV Data CLI!")
-    file_name = input("Enter the CSV file name (default: dias_catalogue.csv): ") or "dias_catalogue.csv"
+    file_name = input("Enter the CSV file name (default: dias_catalogue.csv): ") or "../dias_catalogue.csv"
     try:
         csv = pd.read_csv(file_name)
     except Exception as e:

@@ -57,7 +57,7 @@ def query_cluster_by_name(conn: Connection, cluster_name: str):
 
 def main():
     # Load CSV
-    df = pd.read_csv("dias_catalogue.csv")
+    df = pd.read_csv("../dias_catalogue.csv")
 
     # clean the dataset
     df = df.replace('', None)
