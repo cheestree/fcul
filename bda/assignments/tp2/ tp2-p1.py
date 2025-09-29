@@ -11,7 +11,7 @@ def readCSV(file_name: str):
         raise Exception(f"Error loading file {e}")
     return csv
 
-def map_dtype_to_mysql(dtype):
+def mapDtypeToMysql(dtype):
     if pd.api.types.is_integer_dtype(dtype):
         return "INT"
     elif pd.api.types.is_float_dtype(dtype):
@@ -19,12 +19,12 @@ def map_dtype_to_mysql(dtype):
     elif pd.api.types.is_bool_dtype(dtype):
         return "BOOLEAN"
     else:
-        return "VARCHAR(255)"
+        return "VARCHAR(32)"
 
 def createColumns(csv: pd.DataFrame):
     columns = ['id INT AUTO_INCREMENT PRIMARY KEY']
     for col, dtype in csv.dtypes.items():
-        sql_type = map_dtype_to_mysql(dtype)
+        sql_type = mapDtypeToMysql(dtype)
         columns.append(f"`{col}` {sql_type}")
     return ", ".join(columns)
 
@@ -81,8 +81,8 @@ def selectRows(cursor: MySQLCursorAbstract, table: str, column: str, threshold: 
     for row in cursor.fetchall():
         print(row)
 
-def selectSpecificColumns(cursor: MySQLCursorAbstract):
-    cursor.execute("SELECT name, RA_ICRS, DE_ICRS, Diam_pc FROM star_clusters WHERE Plx > %s", (1,))
+def selectSpecificColumns(cursor: MySQLCursorAbstract, table: str):
+    cursor.execute(f"SELECT name, RA_ICRS, DE_ICRS, Diam_pc FROM {table} WHERE Plx > %s", (1,))
     for row in cursor.fetchall():
         print(row)
 
@@ -91,18 +91,18 @@ def updateAgeOfSpecificRowBasedOnName(cursor: MySQLCursorAbstract, name: str, ag
     count = cursor.rowcount
     print(count)
 
-def deleteRow(cursor: MySQLCursorAbstract, name: str):
-    cursor.execute("DELETE FROM star_clusters WHERE name = %s", (name,))
+def deleteRow(cursor: MySQLCursorAbstract, table: str, name: str):
+    cursor.execute(f"DELETE FROM {table} WHERE name = %s", (name,))
     count = cursor.rowcount
     print(count)
 
-def findByName(cursor: MySQLCursorAbstract, name: str):
-    cursor.execute("SELECT name, dist_PLX FROM star_clusters WHERE name LIKE %s", (f"%{name}%",))
+def findByName(cursor: MySQLCursorAbstract, table: str, name: str):
+    cursor.execute(f"SELECT name, dist_PLX FROM {table} WHERE name LIKE %s", (f"%{name}%",))
     for row in cursor.fetchall():
         print(row)
 
-def aggregateFunction(cursor: MySQLCursorAbstract):
-    cursor.execute("SELECT count(*) FROM star_clusters WHERE FeH < 0")
+def aggregateFunction(cursor: MySQLCursorAbstract, table: str):
+    cursor.execute(f"SELECT count(*) FROM {table} WHERE FeH < 0")
     result = cursor.fetchone()
     print(result[0])
 
@@ -142,21 +142,21 @@ def main():
     selectRows(cursor, "star_clusters", "DiamMax_pc", 20)
 
     #   Exercise 6
-    selectSpecificColumns(cursor)
+    selectSpecificColumns(cursor, "star_clusters")
 
     #   Exercise 7
-    updateAgeOfSpecificRowBasedOnName(cursor, "NGC 188", 999)
+    updateAgeOfSpecificRowBasedOnName(cursor, "NGC_188", 999)
     connection.commit()
 
     #   Exercise 8
-    deleteRow(cursor, "NGC 188")
+    deleteRow(cursor, "star_clusters", "NGC_188")
     connection.commit()
 
     #   Exercise 9
-    findByName(cursor, "NGC")
+    findByName(cursor, "star_clusters", "NGC")
 
     #   Exercise 10
-    aggregateFunction(cursor)
+    aggregateFunction(cursor, "star_clusters")
 
     cursor.close()
     connection.close()
