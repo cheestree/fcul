@@ -1,6 +1,6 @@
 [submodule "cm/assignments/BusinessCard"]
 	path = cm/assignments/BusinessCard
-	url = git@github.com:cheestree/BusinessCard
+	url = git@github.com:cheestree/business-card.git
 [submodule "cm/assignments/DiceRoller"]
 	path = cm/assignments/DiceRoller
-	url = git@github.com:cheestree/DiceRoller.git
+	url = git@github.com:cheestree/dice-roller.git
