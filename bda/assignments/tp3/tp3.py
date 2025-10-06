@@ -141,7 +141,7 @@ def main():
         lambda s: s.to_dict(), axis=1
     )
 
-    # Write out Name and features to a json file
+    #   Write out Name and features to a json file
     df[['name', 'position', 'features']].to_json("dias_catalogue_filtered.json", 
         orient = "records", 
         date_format = "iso", 
