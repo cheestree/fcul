@@ -1,11 +1,13 @@
 import json
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 import pymongo as pm
 from pymongo.database import Collection
 
+
 def createConnection(host: str, port: str, user: str, password: str, collection: str):
-    client = pm.MongoClient(f"mongodb://{host}:{port}/user={user}&password={password}")
+    client = pm.MongoClient(f"mongodb://{user}:{password}@{host}:{port}/?authSource=admin")
     mydb = client["adb"]
     mycol = mydb[collection]
     return mycol
