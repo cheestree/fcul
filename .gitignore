@@ -46,3 +46,7 @@ bin/
 
 ### IDE ###
 .idea
+
+### Custom ###
+*.pdf
+*.json
