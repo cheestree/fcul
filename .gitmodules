@@ -7,3 +7,6 @@
 [submodule "cm/assignments/MarsPhoto"]
 	path = cm/assignments/MarsPhoto
 	url = git@github.com:cheestree/mars-photo.git
+[submodule "ppc/assignments"]
+	path = ppc/assignments
+	url = git@github.com:cheestree/prog-paral-conc-2025.git
