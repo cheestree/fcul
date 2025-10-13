@@ -82,8 +82,8 @@ def queryMongoDB(conn: Collection, filter: dict, sort: Optional[dict] = None, as
     if limit:
         docs_nested = docs_nested.limit(limit)
     
-    docs_list = list(docs_nested)
     time_f = time.time()
+    docs_list = list(docs_nested)
     print('docs nested = ', len(docs_list))
     print('total time pymongo = ', time_f-time_i)
 
