@@ -195,21 +195,25 @@ def serializableTransaction():
 def main():
     createAndLoadMySQL("localhost", "root", "root")
 
+    print("----- Basic Transaction -----")
     #   Exercise 1: No, it does not, as the default isolation level is REPEATABLE READ,
     #   which prevents dirty reads, a read operation from seeing uncommitted changes
     #   from other transactions.
     basicTransaction()
 
+    print("----- Dirty Read Transaction -----")
     #   Exercise 2: Yes, it does, as we specify the isolation level to READ UNCOMMITTED.
     #   This allows dirty reads, meaning a read operation can see uncommitted changes
     #   from other transactions.
     dirtyReadTransaction()
 
+    print("----- Non-Repeatable Read Transaction -----")
     #   Exercise 3: Yes, it does, as we specify the isolation level to READ COMMITTED.
     #   This allows non-repeatable reads, meaning a read operation can see changes
     #   committed by other transactions after the initial read.
     nonRepeatableReadTransaction()
 
+    print("----- Phantom Read Transaction -----")
     #   Exercise 4: No, it did NOT prevent phantom reads in THEORY, but MySQL's 
     #   implementation of REPEATABLE READ actually DOES prevent phantom reads using
     #   Next-Key Locking. This is different from the SQL standard, where REPEATABLE READ
@@ -218,6 +222,7 @@ def main():
     #   to Session A's transaction.
     phantomReadTransaction()
 
+    print("----- Serializable Transaction -----")
     #   Exercise 5: It is blocked, as we specify the isolation level to SERIALIZABLE.
     #   Serializable prevents phantom reads by ensuring that transactions are executed
     #   in a way that they appear to be serialized, thus preventing other transactions
