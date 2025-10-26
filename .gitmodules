@@ -10,3 +10,6 @@
 [submodule "ppc/assignments"]
 	path = ppc/assignments
 	url = git@github.com:cheestree/prog-paral-conc-2025.git
+[submodule "cm/assignments/SmartBoy"]
+	path = cm/assignments/SmartBoy
+	url = git@github.com:cheestree/comp-movel-2025.git
