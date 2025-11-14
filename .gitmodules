@@ -7,9 +7,15 @@
 [submodule "cm/assignments/MarsPhoto"]
 	path = cm/assignments/MarsPhoto
 	url = git@github.com:cheestree/mars-photo.git
-[submodule "ppc/assignments"]
-	path = ppc/assignments
-	url = git@github.com:cheestree/prog-paral-conc-2025.git
 [submodule "cm/assignments/SmartBoy"]
 	path = cm/assignments/SmartBoy
 	url = git@github.com:cheestree/comp-movel-2025.git
+[submodule "ss/assignments"]
+	path = ss/assignments
+	url = git@github.com:DanielSousa01/seg-soft-2025.git
+[submodule "bda/project"]
+	path = bda/project
+	url = git@github.com:cheestree/base-dados-avan-2025.git
+[submodule "ppc/assignments"]
+	path = ppc/assignments
+	url = git@github.com:cheestree/prog-paral-conc-2025.git
