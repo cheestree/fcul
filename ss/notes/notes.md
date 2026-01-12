@@ -287,7 +287,7 @@ In sum:
 
 ### A10 Server-Side Request Forgery (SSRF)
 
-**Cross-Site Request Forgery** (**SSRF**) occurs when a web application fetches a remote resource without validating the user-supplied URL. This allows an attacker to coerce the application to send requests to unintended locations, including internal systems that are not directly accessible from the outside.
+**Server-Side Request Forgery** (**SSRF**) occurs when a web application fetches a remote resource without validating the user-supplied URL. This allows an attacker to coerce the application to send requests to unintended locations, including internal systems that are not directly accessible from the outside.
 
 In sum:
 
