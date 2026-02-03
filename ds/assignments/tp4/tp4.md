@@ -2,54 +2,54 @@
 
 ## Worksheet 4
 
-### 1 - Explanation of bridge between problem space and solution space
+### 1 - The software architecture is said to be a bridge between the problem space and the solution space because it consists of a set of decisions on how the system should be structured to ensure that the needs of its stakeholders are met
 
-#### a. Applied to tax assessment software
+#### a. Using the example of the software for income tax assessment in Portugal, explain what this means
+>
+> The software is modeled so that it can meet the end users' necessity and throughput, while maintaining a low-cost model for the state. This tends to make or break it depending on the usability, specifically what happens most years where, due to a lot of users accessing the website and making requests, crashes the servers, making it unusable for some time.
 
-The software is modeled so that it can meet the end users' necessity and throughput, while maintaining a low-cost model for the state. This tends to make or break it depending on the usability, specifically what happens most years where, due to a lot of users accessing the website and making requests, crashes the servers, making it unusable for some time.
+#### b. Do the same exercise for augmented reality translation software between different languages
+>
+> The most popular languages are prioritized due to a higher usage and, so, users. This means that the software is available for the majority of the userbase, garnering more funding and also more time for developers to incrementally add new languages.
 
-#### b. Applied to augmented reality translation software
+### 2 - The architecture of a software system is composed of various structures. Identify some structures on which it is typically important to make decisions and that are frequently useful in documenting the architecture of a software system
+>
+> The repository layer and how it connects and queries databases, the service layer where actual operations are executed based on input data, or the web layer, where the server receives the users' requests and processes it before sending it to the service layer.  
+> All of these 3 layers are in need of doccumentation due to the ever changing software needs.
 
-The most popular languages are prioritized due to a higher usage and, so, users. This means that the software is available for the majority of the userbase, garnering more funding and also more time for developers to incrementally add new languages.
+### 3 - One of the generally applicable software structures is decomposition
 
-### 2 - Structures of software architecture
+#### a. Regarding an architectural view that exclusively addresses this structure: what type of elements does it describe and what type of relationships? Using a notation of your choice, illustrate with an example
+>
+> It describes modules and a "is-part-of" relation, like encapsulation.
 
-The repository layer and how it connects and queries databases, the service layer where actual operations are executed based on input data, or the web layer, where the server receives the users' requests and processes it before sending it to the service layer.  
-All of these 3 layers are in need of doccumentation due to the ever changing software needs.
+#### b. What can and cannot be said about the data flow and control flow of a system from a view that exclusively addresses this structure?
+>
+> No loops are allowed, so one can't be part of another that is already a part of itself. It will always answer to the higher-up module.
 
-### 3 - Decomposition structure
+#### c. Why is an architectural view that addresses this structure useful?
+>
+> To assign responsibilities to modules as prelude to downstream work. It also helps in conducting impact analysis, developing work assignments and communicating to new developers, in chunks, how the software is organized.
 
-#### a. Type of elements and relationships of Decomposition
+### 4 - Another module-centric software structure is allowed-to-use
 
-It describes modules and a "is-part-of" relation, like encapsulation.
+#### a. Regarding an architectural view that exclusively addresses this structure: what type of elements does it describe, and what type of relationships? Using a notation of your choice, illustrate with an example
+>
+> It describes layers and the usage definition rules. A layer is allowed to use any lower layer, or only the layer directly under it.
 
-#### b. Data and control flow of Decomposition
+#### b. Why is an architectural view that addresses this structure useful?
+>
+> It promotes portability and modifiability, incremental development, separation of concerns and reuse.
 
-No loops are allowed, so one can't be part of another that is already a part of itself. It will always answer to the higher-up module.
+#### c. How does the applicability of the decomposition structure compare to that of allowed-to-use?
+>
+> One is better for a overview analysis, while the other is a more strict, rule-based architecture for interactions between modules.
 
-#### c. Usefulness of Decomposition
+### 5 - When documenting a module view of a system, you may choose to identify certain aggregated modules as subsystems. A subsystem often describes a part of a system that: carries out a functionally cohesive subset of the overall system’s mission, can be executed independently, and can be deployed incrementally
 
-To assign responsibilities to modules as prelude to downstream work. It also helps in conducting impact analysis, developing work assignments and communicating to new developers, in chunks, how the software is organized.
-
-### 4 - Allowed-to-use structure
-
-#### a. Type of elements and relationships of ALlowed-to-use
-
-It describes layers and the usage definition rules. A layer is allowed to use any lower layer, or only the layer directly under it.
-
-#### b. Usefulness of Allowed-to-use
-
-It promotes portability and modifiability, incremental development, separation of concerns and reuse.
-
-#### c. Comparison of Allowed-to-use and Decomposition
-
-One is better for a overview analysis, while the other is a more strict, rule-based architecture for interactions between modules.
-
-### 5 - Aggregated modules, or subsystems
-
-#### a. Subsystems of a Mars exploratory robot
-
-Several subsystems that might compose a Mars exploratory robot include:
+#### a. Identify the several subsystems that might compose a Mars exploratory robot
+>
+>Several subsystems that might compose a Mars exploratory robot include:
 
 1. **Navigation and Mobility Subsystem**
    - Path planning algorithms
@@ -87,9 +87,9 @@ Several subsystems that might compose a Mars exploratory robot include:
    - Mission objectives management
    - Autonomous decision making
 
-#### b. Math utility library as a subsystem
-
-No, a math utility library would **not** be considered a subsystem of the exploratory robot system.
+#### b. Would a math utility library be considered a subsystem of this exploratory robot system? Justify
+>
+> No, a math utility library would **not** be considered a subsystem of the exploratory robot system.
 
 **Justification:**
 
@@ -99,7 +99,7 @@ No, a math utility library would **not** be considered a subsystem of the explor
 - It's more appropriately classified as a **shared module** or **utility layer** that multiple subsystems depend on
 - Unlike true subsystems, it cannot be executed independently in the context of the robot's mission
 
-#### c. Layered design for Mars exploratory robot system
+#### c. Provide a layered design for such a hypothetical exploratory robot system
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
@@ -124,9 +124,9 @@ No, a math utility library would **not** be considered a subsystem of the explor
 └─────────────────────────────────────────────────────────────┘
 ```
 
-#### d. Are subsystems a partition of the system?
-
-No, the subsystems are **not** considered to be a partition of the system in separate parts.
+#### d. Are the subsystems identified considered to be a partition of the system in separate parts? Explain
+>
+> No, the subsystems are **not** considered to be a partition of the system in separate parts.
 
 - In a true partition, each element belongs to exactly one subset with no overlap
 - Subsystems in complex systems like a Mars robot often **share resources** and have **overlapping responsibilities**
