@@ -25,3 +25,6 @@
 [submodule "cn/project"]
 	path = cn/project
 	url = git@github.com:cheestree/computacao-nuvem-2025.git
+[submodule "srsd/project"]
+	path = srsd/project
+	url = git@github.com:cheestree/seg-redes-sis-dis-2025.git
