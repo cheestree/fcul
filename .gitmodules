@@ -19,3 +19,9 @@
 [submodule "ppc/assignments"]
 	path = ppc/assignments
 	url = git@github.com:cheestree/prog-paral-conc-2025.git
+[submodule "aw/project"]
+	path = aw/project
+	url = git@github.com:cheestree/aplicacoes-web-2025.git
+[submodule "cn/project"]
+	path = cn/project
+	url = git@github.com:cheestree/computacao-nuvem-2025.git
