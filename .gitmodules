@@ -24,7 +24,7 @@
 	url = git@github.com:cheestree/aplicacoes-web-2026.git
 [submodule "cn/project"]
 	path = cn/project
-	url = git@github.com:cheestree/computacao-nuvem-2026.git
+	url = git@github.com:cheestree/comp-nuvem-2026.git
 [submodule "srsd/project"]
 	path = srsd/project
 	url = git@github.com:cheestree/seg-redes-sis-dis-2026.git
