@@ -1,0 +1,12 @@
+((x(y*)x)|(y(x*)y))?
+
+S -> xYx | yXy | epsilon
+Y -> yY | epsilon
+X -> xX | epsilon
+
+([[](()[()][])])
+
+S -> (S)
+S -> [S]
+S -> 
+S -> SS

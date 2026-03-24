@@ -1,12 +1,12 @@
 import re as r
 
 def main():
-    one_occurrence = r"^(0|10)*11(01|0)*$"
+    one_occurrence = r"^(0|10)*11(01|0)*$" # (0|10)*11(0|01)*
     two_occurrences = r"^(0|10)*11(0|01)*11(01|0)*$"
     even_ones = r"^0*(10*10*)*$"
     no_one_zero_one = r"^(0|11|100)*(|1|10)$"
 
-    identifier = r"^[a-zA-Z_][a-zA-Z0-9_]*$"
+    identifier = r"^([a-zA-Z_][a-zA-Z0-9_]*'*)$"
     boolean = r"^(true|false)$"
     double = r"^-?([0-9]+(\.[0-9]*)?|\.[0-9]+)([eE][+-]?[0-9]+)?[dD]?$"
     integer = r"^-?[0-9]+$"
