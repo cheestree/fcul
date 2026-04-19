@@ -3,12 +3,14 @@ package sut.coverage.linebranch;
 import org.junit.Test;
 import sut.TST;
 
+import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertNull;
 
 public class DeleteLineBranchTest {
 
@@ -48,6 +50,9 @@ public class DeleteLineBranchTest {
 
         assertThat(trie.size(), is(0));
         assertThat(toSet(trie.keys()).isEmpty(), is(true));
+
+        // Requirement: mutation-targeted check that pruning actually removes the physical root node.
+        assertNull(readRoot(trie));
     }
 
     @Test
@@ -70,6 +75,16 @@ public class DeleteLineBranchTest {
             result.add(key);
         }
         return result;
+    }
+
+    private Object readRoot(TST<?> trie) {
+        try {
+            Field rootField = TST.class.getDeclaredField("root");
+            rootField.setAccessible(true);
+            return rootField.get(trie);
+        } catch (ReflectiveOperationException e) {
+            throw new AssertionError("Unable to inspect trie root for pruning assertion", e);
+        }
     }
 }
 

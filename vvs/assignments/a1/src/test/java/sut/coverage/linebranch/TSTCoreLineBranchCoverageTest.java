@@ -99,6 +99,19 @@ public class TSTCoreLineBranchCoverageTest {
         assertThat(missing, empty());
     }
 
+    @Test
+    public void keysWithPrefixNoMatchStillReturnsQueueImplementation() {
+        // Requirement: mutation-targeted check for x==null branch return object at keysWithPrefix().
+        TST<String> trie = new TST<>();
+        trie.put("cat", "v");
+
+        Iterable<String> noMatch = trie.keysWithPrefix("zz");
+        Iterable<String> withMatch = trie.keysWithPrefix("ca");
+
+        assertThat(noMatch instanceof java.util.Queue, is(true));
+        assertThat(withMatch instanceof java.util.Queue, is(true));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void keysWithPrefixNullThrows() {
         // Requirement: line/branch coverage for keysWithPrefix() exceptional branch.
@@ -118,6 +131,50 @@ public class TSTCoreLineBranchCoverageTest {
 
         assertThat(wildcard, containsInAnyOrder("cat", "car"));
         assertThat(none, empty());
+    }
+
+    @Test
+    public void keysThatMatchTraversesLeftAndRightBranchesForExactChar() {
+        // Requirement: mutation-targeted checks for collect() directional guards c<x.c and c>x.c.
+        TST<String> trie = new TST<>();
+        trie.put("m", "root");
+        trie.put("a", "left");
+        trie.put("z", "right");
+
+        assertThat(toSet(trie.keysThatMatch("a")), containsInAnyOrder("a"));
+        assertThat(toSet(trie.keysThatMatch("z")), containsInAnyOrder("z"));
+    }
+
+    @Test
+    public void keysThatMatchExactLengthPatternDoesNotDescendPastPatternEnd() {
+        // Requirement: mutation-targeted check for collect() boundary i < pattern.length() - 1.
+        TST<String> trie = new TST<>();
+        trie.put("car", "v1");
+        trie.put("cart", "v2");
+
+        assertThat(toSet(trie.keysThatMatch("car")), containsInAnyOrder("car"));
+    }
+
+    @Test
+    public void keysThatMatchWildcardTraversesRightWhenRootCharacterIsAlphabetic() {
+        // Requirement: mutation-targeted check for wildcard right traversal in collect().
+        TST<String> trie = new TST<>();
+        trie.put("m", "root");
+        trie.put("a", "left");
+        trie.put("z", "right");
+
+        assertThat(toSet(trie.keysThatMatch(".")), containsInAnyOrder("m", "a", "z"));
+    }
+
+    @Test
+    public void keysThatMatchWildcardTraversesLeftForLowAsciiRoot() {
+        // Requirement: mutation-targeted check for wildcard left traversal when '.' is not less than node char.
+        TST<String> trie = new TST<>();
+        trie.put("!", "bang");
+        trie.put(" ", "space");
+        trie.put("~", "tilde");
+
+        assertThat(toSet(trie.keysThatMatch(".")), containsInAnyOrder("!", " ", "~"));
     }
 
     private Set<String> toSet(Iterable<String> iterable) {

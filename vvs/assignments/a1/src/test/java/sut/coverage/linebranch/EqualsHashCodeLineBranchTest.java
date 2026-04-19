@@ -3,6 +3,8 @@ package sut.coverage.linebranch;
 import org.junit.Test;
 import sut.TST;
 
+import java.util.Objects;
+
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -41,6 +43,7 @@ public class EqualsHashCodeLineBranchTest {
 
         assertThat(left.equals(right), is(true));
         assertThat(left.hashCode(), is(right.hashCode()));
+        assertThat(right.equals(left), is(true));
     }
 
     @Test
@@ -76,6 +79,29 @@ public class EqualsHashCodeLineBranchTest {
         right.put("dog", "1");
 
         assertThat(left.equals(right), is(false));
+    }
+
+    @Test
+    public void hashCodeMatchesDocumentedAccumulatorFormula() {
+        // Requirement: mutation-targeted oracle for hashCode accumulator math and return value.
+        TST<String> trie = new TST<>();
+        trie.put("cat", "1");
+        trie.put("dog", "2");
+
+        int expected = 1;
+        expected = 31 * expected + Objects.hash("cat", "1");
+        expected = 31 * expected + Objects.hash("dog", "2");
+
+        assertThat(trie.hashCode(), is(expected));
+    }
+
+    @Test
+    public void hashCodeForNonEmptyTrieIsNotZero() {
+        // Requirement: mutation-targeted check to reject constant-zero hashCode return.
+        TST<String> trie = new TST<>();
+        trie.put("cat", "1");
+
+        assertThat(trie.hashCode() == 0, is(false));
     }
 }
 
