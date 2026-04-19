@@ -106,7 +106,7 @@ public class TST<T> {
     public void put(String key, T val) {
         if (key == null)
             throw new IllegalArgumentException("calls put() with null key");
-        if (!contains(key)) 
+        if (!contains(key))
         	n++;
         root = put(root, key, val, 0);
     }
@@ -228,6 +228,72 @@ public class TST<T> {
         }
         if (c == '.' || c > x.c) 
         	collect(x.right, prefix, i, pattern, queue);
+    }
+
+    /**
+     * Removes the key (and associated value) from the symbol table.
+     * @param key the key
+     * @throws IllegalArgumentException if {@code key} is {@code null}
+     */
+    public void delete(String key) {
+        if (key == null)
+            throw new IllegalArgumentException("calls delete() with null key");
+        if (key.length() == 0)
+            throw new IllegalArgumentException("key must have length >= 1");
+        if (!contains(key))
+            return;
+        n--;
+        root = delete(root, key, 0);
+    }
+
+    private Node<T> delete(Node<T> x, String key, int d) {
+        if (x == null)
+            return null;
+        char c = key.charAt(d);
+        if (c < x.c) {
+            x.left = delete(x.left, key, d);
+        } else if (c > x.c) {
+            x.right = delete(x.right, key, d);
+        } else if (d < key.length() - 1) {
+            x.mid = delete(x.mid, key, d + 1);
+        } else {
+            x.val = null;
+        }
+
+        if (x.val != null)
+            return x;
+        if (x.left != null || x.mid != null || x.right != null)
+            return x;
+        return null;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other)
+            return true;
+        if (!(other instanceof TST<?>))
+            return false;
+
+        TST<?> that = (TST<?>) other;
+        if (this.size() != that.size())
+            return false;
+
+        for (String key : this.keys()) {
+            if (!that.contains(key))
+                return false;
+            if (!Objects.equals(this.get(key), that.get(key)))
+                return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 1;
+        for (String key : keys()) {
+            result = 31 * result + Objects.hash(key, get(key));
+        }
+        return result;
     }
 
 }
