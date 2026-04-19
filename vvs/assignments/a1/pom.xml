@@ -28,6 +28,7 @@
 		<junit.vintage.version>${junit.version}.2</junit.vintage.version>
 		<junit.platform.version>1.0.2</junit.platform.version>
 		<kotlin.version>2.2.20</kotlin.version>
+		<pitest.version>1.15.6</pitest.version>
 	</properties>
 
 	<dependencies>
@@ -114,6 +115,24 @@
 			given to the generated war, and hence the context root) -->
 		<finalName>${project.artifactId}</finalName>
 		<plugins>
+			<plugin>
+				<groupId>org.pitest</groupId>
+				<artifactId>pitest-maven</artifactId>
+				<version>${pitest.version}</version>
+				<configuration>
+					<targetClasses>
+						<param>sut.TST</param>
+					</targetClasses>
+					<includedMethods>
+						<param>longestPrefixOf</param>
+					</includedMethods>
+					<outputFormats>
+						<param>XML</param>
+						<param>HTML</param>
+					</outputFormats>
+					<timestampedReports>false</timestampedReports>
+				</configuration>
+			</plugin>
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>${version.war.plugin}</version>
