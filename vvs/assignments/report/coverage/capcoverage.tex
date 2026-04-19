@@ -26,6 +26,10 @@ The suite intentionally mixes normal behavior and guard behavior (for example, n
 	\label{fig:line-branch-coverage}
 \end{figure}
 
+The 2 lines without coverage are relative to a try-catch block that is not triggered by any test, as it guards against an \texttt{ReflectiveOperationException} that cannot occur in the current implementation.
+
+Similarly, there is 1 uncovered branch that is unreachable due to being covered in a public method. For example, the branch in \texttt{delete} that checks for a null node is not covered because the public \texttt{delete} method already guards against null nodes, so the internal method is never called with a null node.
+
 \section{\texttt{longestPrefixOf}: Structural and Logic-Based Criteria}
 
 Method \texttt{longestPrefixOf} was tested with three independent paradigms to avoid overfitting tests to a single test-design style.
