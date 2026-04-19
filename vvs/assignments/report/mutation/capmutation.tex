@@ -1,0 +1,70 @@
+\chapter{Mutation with PIT} \label{cap:mutation}
+
+\section{Mutation Analysis Setup}
+
+Program mutation testing was executed with PIT over class \texttt{sut.TST}.
+The comparison goal was restricted to method \texttt{longestPrefixOf}, using one criterion-specific class per run:
+Edge-Pair, Prime Path, and Logic-based (CDC).
+Each run selected the relevant test class through \texttt{-DtargetTests=...}, so mutation outcomes could be compared under controlled test-selection conditions.
+
+\section{Execution Commands}
+
+The following command sequence can be used to reproduce the PIT runs used in this report.
+Because reports are generated in \texttt{target/pit-reports}, copying \texttt{mutations.xml} after each run keeps per-criterion artifacts separate.
+
+\begin{verbatim}
+# Edge-Pair suite
+mvn -DtargetTests=sut.coverage.longestprefix.edgepair.LongestPrefixOfEdgePairTest \
+    org.pitest:pitest-maven:mutationCoverage
+cp target/pit-reports/mutations.xml target/pit-reports/mutations-edgepair.xml
+
+# Prime Path suite
+mvn -DtargetTests=sut.coverage.longestprefix.primepath.LongestPrefixOfPrimePathTest \
+    org.pitest:pitest-maven:mutationCoverage
+cp target/pit-reports/mutations.xml target/pit-reports/mutations-primepath.xml
+
+# Logic-based (CDC) suite
+mvn -DtargetTests=sut.coverage.longestprefix.logic.LongestPrefixOfConditionDecisionTest \
+    org.pitest:pitest-maven:mutationCoverage
+cp target/pit-reports/mutations.xml target/pit-reports/mutations-cdc.xml
+\end{verbatim}
+
+\section{Comparison for \texttt{longestPrefixOf}}
+
+The project report \texttt{longestPrefixOf-mutation-comparison.md} was used to consolidate results per criterion.
+Because PIT report summaries may include mutations from multiple methods, comparison values were computed from XML report entries filtered by \texttt{mutatedMethod = longestPrefixOf}.
+
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|l|r|r|r|r|r|}
+		\hline
+		Criterion & Total Mutants & Killed & Survived & No Coverage & Mutation Score \\
+		\hline
+		Edge-Pair & 13 & 13 & 0 & 0 & 100\% \\
+		Prime Path & 13 & 13 & 0 & 0 & 100\% \\
+		Logic-based (CDC) & 13 & 13 & 0 & 0 & 100\% \\
+		\hline
+	\end{tabular}
+	\caption{Mutation comparison for \texttt{TST.longestPrefixOf}}
+\end{table}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.95\textwidth]{mutation/images/mutationresult.png}
+	\caption{PIT mutation report evidence used in the criterion comparison}
+	\label{fig:pit-mutation-evidence}
+\end{figure}
+
+\section{Improvements Performed}
+
+Initial Prime Path and CDC runs each showed one \texttt{longestPrefixOf} mutant without coverage.
+To close these gaps, one guard-focused test was added to each suite:
+\texttt{primePath\_entry\\GuardEmptyQuery} in \texttt{LongestPrefixOfPrimePathTest} and
+\texttt{cdc\_entryGuardEmptyQuery} in \texttt{LongestPrefixOfConditionDecisionTest}.
+After this refinement, all criteria reached full mutation adequacy for \texttt{longestPrefixOf}.
+
+\section{Discussion}
+
+The final result shows that all three criteria killed the same set of \texttt{longestPrefixOf} mutants.
+Even with identical final scores, the criteria provide complementary evidence: edge-pair tests emphasize local transition correctness, prime-path tests stress deeper path behavior, and CDC targets decision sensitivity.
+Using these perspectives together increases confidence in both control-flow and logic-level correctness.

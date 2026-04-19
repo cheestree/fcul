@@ -21,10 +21,8 @@ public class TSTPropertiesTest {
 
     @Property
     public void insertionOrderOfDifferentKeysDoesNotChangeFinalTreeValue(@From(TSTGenerator.class) TST<String> trie) {
-        List<String> keys = new ArrayList<>();
-        for (String key : trie.keys()) {
-            keys.add(key);
-        }
+        // Property 1: insertion order of distinct keys must not change the final trie value.
+        List<String> keys = keysOf(trie);
 
         TST<String> first = new TST<>();
         for (String key : keys) {
@@ -42,12 +40,8 @@ public class TSTPropertiesTest {
 
     @Property
     public void removeAllKeysLeavesTreeEmpty(@From(TSTGenerator.class) TST<String> trie) {
-        List<String> keys = new ArrayList<>();
-        for (String key : trie.keys()) {
-            keys.add(key);
-        }
-
-        for (String key : keys) {
+        // Property 2: deleting every stored key must leave the trie empty.
+        for (String key : keysOf(trie)) {
             trie.delete(key);
         }
 
@@ -57,6 +51,7 @@ public class TSTPropertiesTest {
     @Property
     public void insertThenRemoveSameKeyValueKeepsInitialTree(@From(TSTGenerator.class) TST<String> trie,
                                                              @InRange(minInt = 0, maxInt = 1000) int suffix) {
+        // Property 3: adding and then removing the same fresh key should restore the initial trie.
         TST<String> before = copyOf(trie);
 
         String key = "extra" + suffix;
@@ -71,20 +66,16 @@ public class TSTPropertiesTest {
     }
 
     @Property
-    public void stricterPrefixReturnsSubset(@From(TSTGenerator.class) TST<String> trie,
-                                            @InRange(minInt = 1, maxInt = 5) int cut) {
-        List<String> keys = new ArrayList<>();
-        for (String key : trie.keys()) {
-            if (key.length() >= 2) {
-                keys.add(key);
-            }
-        }
-
+    public void stricterPrefixReturnsStrictSubset(@From(TSTGenerator.class) TST<String> trie,
+                                                  @InRange(minInt = 0, maxInt = 20) int indexHint) {
+        // Property 4: keysWithPrefix(stricter) is a subset of keysWithPrefix(broader), and strict when distinguishable.
+        List<String> keys = keysOf(trie);
         Assume.assumeTrue(!keys.isEmpty());
 
-        String key = keys.get(Math.abs(cut) % keys.size());
-        int split = Math.min(Math.max(1, cut), key.length() - 1);
+        String key = keys.get(indexHint % keys.size());
+        Assume.assumeTrue(key.length() >= 2);
 
+        int split = 1 + (indexHint % (key.length() - 1));
         String broadPrefix = key.substring(0, split);
         String strictPrefix = key.substring(0, split + 1);
 
@@ -92,6 +83,26 @@ public class TSTPropertiesTest {
         Set<String> strict = toSet(trie.keysWithPrefix(strictPrefix));
 
         assertTrue(broad.containsAll(strict));
+
+        boolean hasBroadOnlyKey = false;
+        for (String candidate : broad) {
+            if (!strict.contains(candidate)) {
+                hasBroadOnlyKey = true;
+                break;
+            }
+        }
+
+        // Only enforce proper-subset when the generated trie has keys that separate both prefixes.
+        Assume.assumeTrue(hasBroadOnlyKey);
+        assertTrue(broad.size() > strict.size());
+    }
+
+    private List<String> keysOf(TST<String> trie) {
+        List<String> keys = new ArrayList<>();
+        for (String key : trie.keys()) {
+            keys.add(key);
+        }
+        return keys;
     }
 
     private TST<String> copyOf(TST<String> trie) {
@@ -110,4 +121,3 @@ public class TSTPropertiesTest {
         return result;
     }
 }
-
