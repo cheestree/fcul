@@ -36,7 +36,7 @@ cp target/pit-reports/mutations.xml target/pit-reports/mutations-cdc.xml
 The project report \texttt{longestPrefixOf-mutation-comparison.md} was used to consolidate results per criterion.
 Results below were refreshed from PIT reruns on \texttt{2026-04-19}, using
 \texttt{target/pit-reports/mutations-edgepair.xml},
-\texttt{target/pit-reports/mutations-primepath.xml}, and
+\texttt{target/pit-reports/mutations-\\primepath.xml}, and
 \texttt{target/pit-reports/mutations-cdc.xml}.
 
 \begin{table}[H]
@@ -87,16 +87,6 @@ Although final mutation scores are identical, PIT's \texttt{killingTest} field i
 Historical pre-improvement PIT XML was not archived in this workspace, so a fully reproducible baseline table with exact earlier counts cannot be reconstructed.
 What is reproducible in the current workspace is the improvement action and the final rerun state.
 Two targeted guard tests were added to close entry-guard gaps in \texttt{longestPrefixOf}:
-\texttt{primePath\_entryGuardEmptyQuery} in \texttt{LongestPrefixOfPrimePathTest} and
-\texttt{cdc\_entryGuardEmptyQuery} in \texttt{LongestPrefixOfConditionDecisionTest}.
+\texttt{primePath\_entry\\GuardEmptyQuery} in \texttt{LongestPrefixOfPrimePathTest} and
+\texttt{cdc\_entryGuardEmptyQuery} in \texttt{LongestPrefixOf\\ConditionDecisionTest}.
 Current reruns confirm that all three criteria now kill all 13 \texttt{longestPrefixOf} mutants.
-
-\section{Discussion}
-
-The final result shows that all three criteria killed the same set of \texttt{longestPrefixOf} mutants.
-Even with identical final scores, the criteria provide complementary evidence: edge-pair tests emphasize local transition correctness, prime-path tests stress deeper path behavior, and CDC targets decision sensitivity.
-Using these perspectives together increases confidence in both control-flow and logic-level correctness.
-
-For completeness, the remaining non-\texttt{longestPrefixOf} surviving mutants are boundary changes in
-\texttt{collect} (lines 219 and 229), used by \texttt{keysThatMatch}.
-They are likely equivalent, since changing \texttt{<} to \texttt{<=} and \texttt{>} to \texttt{>=} at those points only explores an extra null branch in wildcard traversal and does not change the returned set of matched keys.
