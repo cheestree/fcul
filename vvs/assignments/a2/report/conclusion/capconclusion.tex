@@ -1,13 +1,1 @@
 \chapter{Conclusion} \label{cap:conclusion}
-
-The final result shows that all three criteria killed the same set of \texttt{longestPrefixOf} mutants.
-Even with identical final scores, the criteria provide complementary evidence: edge-pair tests emphasize local transition correctness, prime-path tests stress deeper path behavior, and CDC targets decision sensitivity.
-Using these perspectives together increases confidence in both control-flow and logic-level correctness.
-
-For completeness, the remaining non-\texttt{longestPrefixOf} surviving mutants are boundary changes in
-\texttt{collect} (lines 219 and 229), used by \texttt{keysThatMatch}.
-They are equivalent, since changing \texttt{<} to \texttt{<=} and \texttt{>} to \texttt{>=} at those points the nodes exist, and the extra explored branch is always null and produces no output.
-
-PIT's mutation analysis provided detailed insights into which test obligations were most effective at killing mutants, reinforcing the value of using multiple criteria to achieve comprehensive test coverage and fault detection.
-
-Accompanied with logic-based criterion tests and edge-pair, prime-path and CDC tests, the test suit is now robust against a wide range of faults.
