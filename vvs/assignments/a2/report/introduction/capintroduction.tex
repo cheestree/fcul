@@ -1,0 +1,20 @@
+\chapter{Introduction} \label{cap:intro}
+
+This report presents the test design and evaluation performed for the class \texttt{sut.TST}, a ternary search trie implementation.
+The work follows the assignment requirements and is organized around four complementary goals:
+
+\begin{itemize}
+	\item Achieve line and branch coverage for each public method in the SUT.
+	\item Design dedicated test suites for \texttt{longestPrefixOf} using edge-pair, prime-path, and one logic-based criterion.
+	\item Design an Input State Partitioning (ISP) test set for \texttt{put} using Base Choice Coverage.
+	\item Evaluate mutation adequacy with PIT, compare criteria for \texttt{longestPrefixOf}, and improve tests when needed.
+\end{itemize}
+
+The solution uses JUnit 4 for unit tests, JUnit QuickCheck for property-based testing, and PIT for mutation analysis.
+In addition, the SUT includes \texttt{equals()} and \texttt{delete()} methods to support semantic and property-based validation.
+
+The remainder of this document is structured as follows:
+\begin{itemize}
+    \item Chapter~\ref{cap:coverage} describes the coverage-oriented and property-based test suites, including package organization and requirement traceability.
+    \item Chapter~\ref{cap:mutation} presents PIT-based mutation results and compares the mutation effectiveness of each criterion for \texttt{longestPrefixOf}.
+\end{itemize}
