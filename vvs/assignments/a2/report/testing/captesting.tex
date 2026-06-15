@@ -1,0 +1,13 @@
+\chapter{Strategy and Testing} \label{cap:testing}
+
+The testing strategy employed for this web application is based on a combination of unit testing, integration testing, and end-to-end testing. This comprehensive approach ensures that all components of the application are thoroughly tested for functionality, reliability, and performance.
+
+When approaching testing, the following thought process was followed:
+\begin{itemize}
+    \item \textbf{Happy Path Testing} - This involves testing the application under normal conditions to ensure that it behaves as expected when provided with valid input. It includes testing the core functionalities of the application, such as creating, reading, updating, and deleting calendar events, as well as searching for relevant events from third-party sources.
+    \item \textbf{Bad Path Testing} - This involves testing the application with invalid input or under abnormal conditions to ensure that it can handle errors gracefully. It includes testing for edge cases, such as empty input, invalid data formats, and unexpected user behavior.
+\end{itemize}
+
+The testing tools used for this application include JUnit for unit testing, Mockito for mocking dependencies, and H2 database for testing database interactions. H2 was also used to test the application in a production-like environment, ensuring that the application can handle real-world scenarios effectively (as this is also a requirement for the assignment).
+
+To support consistent testing, Continuous Integration (CI) was set up using GitHub Actions. This allows for automated testing whenever changes are made to the codebase, ensuring that any issues are identified and addressed promptly.

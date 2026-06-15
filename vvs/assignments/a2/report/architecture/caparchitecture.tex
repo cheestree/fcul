@@ -1,0 +1,13 @@
+\chapter{System Architecture} \label{cap:arch}
+
+The architecture of the web application follows a layered design pattern, which promotes separation of concerns and enhances maintainability. The main layers of the application include:
+
+\begin{itemize}
+    \item \textbf{Controller Layer} - This layer handles incoming HTTP requests and maps them to the appropriate service methods. It is responsible for processing user input and returning responses.
+    \item \textbf{Service Layer} - This layer contains the business logic of the application. It processes data received from the controller layer and interacts with the data access layer to perform CRUD operations. Additionally, it includes logic for rendering a static web page.
+    \item \textbf{External API Layer} - This layer is responsible for communicating with third-party APIs to fetch relevant calendar events. It abstracts the details of API interactions and provides a clean interface for the service layer to use.
+    \item \textbf{Data Access Layer} - This layer is responsible for interacting with the database. It uses repositories to perform operations on the data model and manage persistence.
+    \item \textbf{Model Layer} - This layer defines the data structures and entities used in the application. It includes classes that represent calendar events, user information, and other relevant data.
+\end{itemize}
+
+The application also incorporates security features to protect user data and ensure secure access to the application. It uses Spring Security to manage authentication and authorization, allowing users to securely log in and access their calendar events.
