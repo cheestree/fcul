@@ -1,2 +1,36 @@
 \chapter{Implementation Details} \label{cap:impl}
 
+\section{Meeting Workflow}
+
+The core meeting workflow is implemented in \texttt{MeetingService}. When a user proposes a meeting, the service creates a \texttt{Meeting} entity and immediately adds the organizer as an accepted participant. Each invited username is trimmed, empty values are ignored, duplicate invitees are skipped, and unknown invitees cause the operation to fail.
+
+Invitation responses are represented by the \texttt{InviteStatus} enum. The service only accepts \texttt{ACCEPTED} or \texttt{DECLINED} as valid responses. Calendar queries exclude declined invitations for the invitee, which means a declined meeting no longer blocks that user's calendar, while the organizer can still see the meeting they created.
+
+\section{Discovery and Calendar Export}
+
+Events copied from discovery providers are transformed into normal meetings with a single accepted participant. If the provider does not supply an end time, the application assigns a default duration of two hours. This keeps copied events simple and allows them to appear immediately in the user's calendar and iCalendar feed.
+
+The iCalendar renderer writes a calendar document with one event entry per meeting. Meeting confirmation state is mapped to calendar status: confirmed meetings are exported as confirmed, while meetings with pending participants are exported as tentative. Basic escaping is applied to text fields before rendering.
+
+\section{Service-Level Issues Found}
+
+Several issues were identified while inspecting the service and controller boundaries:
+
+\begin{itemize}
+    \item \textbf{Conflict detection is not enforced.} The repository defines an overlap query for calendar conflicts, but the meeting service does not use it when proposing meetings or accepting invitations. As a result, users can create or accept overlapping meetings.
+    \item \textbf{Validation is incomplete in the service layer.} The meeting service checks that the end time is after the start time, but it does not explicitly reject blank titles, null start/end values, or a null invitee list. The user service also accepts blank or whitespace-padded usernames, emails, and passwords.
+    \item \textbf{Registration normalization is missing.} Usernames are checked exactly as submitted. This can lead to inconsistent accounts such as \texttt{alice} and \texttt{ alice }, depending on database constraints and user input.
+    \item \textbf{Discovered event copying trusts provider data.} \texttt{copyFromDiscovered} assumes that the event and start time are present, and it does not validate that a supplied end time is after the start time.
+    \item \textbf{Unexpected response actions become declines.} In the meeting response controller, any action other than \texttt{accept} is mapped to \texttt{DECLINED}. A malformed request should ideally be rejected instead of silently declining an invite.
+\end{itemize}
+
+\section{Controller-Level Issues Found}
+
+Other issues were found in the controller layer:
+\begin{itemize}
+    \item \textbf{Meeting action defaults to decline.} The meeting response controller does not validate the \texttt{action} parameter, so any value other than \texttt{accept} results in a decline. This can lead to unintended declines if the client sends an unexpected value or if there is a typo in the request.
+\end{itemize}
+
+Both service and controller issues can be resolved by editing one or the other layer, but ideally, most of the simpler validation like checking for blank fields or invalid parameters should be handled in the controller layer to provide immediate feedback to the client, while more complex business rules like conflict detection should be enforced in the service layer to ensure data integrity regardless of how the service is accessed.
+
+This could be implemented by using Jakarta Bean Validation annotations on the controller request parameters to enforce basic validation rules, but instead, due to time constraints and simpler implementation, the service layer was updated to perform additional checks and throw exceptions for invalid input, which are then translated into appropriate HTTP responses by the controller advice.

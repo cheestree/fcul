@@ -4,6 +4,10 @@ This report presents the test implementation and evaluation of a web application
 
 The tests are built with JUnit and Mockito, as well as H2 database for production/testing purposes. The testing strategy includes unit tests, integration tests, and end-to-end tests to ensure the reliability and robustness of the application.
 
+The application under test is a meeting scheduler with authentication, meeting proposals, invitation responses, personal iCalendar feeds, and event discovery through external providers. In practical terms, this means the quality strategy must cover both internal business rules, such as invite status transitions, and integration boundaries, such as database persistence, security redirects, calendar export, and third-party discovery failures.
+
+The main objective of this assignment is not only to demonstrate that the happy path works, but also to identify weak points in the current implementation. For that reason, the report documents existing behavior, the tests that currently protect it, and service-level risks that should guide future test cases and fixes.
+
 The report is structured as follows:
 \begin{itemize}
     \item Chapter 2: System Architecture - This chapter describes the overall architecture of the application.

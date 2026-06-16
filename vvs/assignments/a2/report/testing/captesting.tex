@@ -11,3 +11,15 @@ When approaching testing, the following thought process was followed:
 The testing tools used for this application include JUnit for unit testing, Mockito for mocking dependencies, and H2 database for testing database interactions. H2 was also used to test the application in a production-like environment, ensuring that the application can handle real-world scenarios effectively (as this is also a requirement for the assignment).
 
 To support consistent testing, Continuous Integration (CI) was set up using GitHub Actions. This allows for automated testing whenever changes are made to the codebase, ensuring that any issues are identified and addressed promptly.
+
+\section{Current Test Coverage}
+
+The current automated tests focus on end-to-end behavior using Spring Boot, H2, and HtmlUnit. The tests start the application on a random port, use a real web driver to interact with the pages, and verify persistence through the repositories. This gives useful confidence that the main browser flows are wired correctly.
+
+The covered scenarios include:
+\begin{itemize}
+    \item registering a new user and verifying that the account is persisted;
+    \item signing in and proposing a meeting with another registered user;
+    \item confirming that the organizer is automatically accepted and invitees start as pending;
+    \item accepting a pending invitation and verifying that the meeting becomes confirmed.
+\end{itemize}

@@ -1,0 +1,15 @@
+\chapter{Evaluation and Results} \label{cap:results}
+
+\section{Observed Results}
+
+The existing end-to-end tests validate the essential user journey from registration to meeting confirmation. The tests exercise the application through HTTP and rendered HTML, while using H2 as the database. This is valuable because it checks more than isolated methods: controllers, templates, security configuration, repositories, and services must work together for the tests to pass.
+
+The tested flows show that the application can create accounts, authenticate users, persist meetings, assign invitation statuses, and update a meeting from tentative to confirmed after acceptance. These are the most important user-facing behaviors for the current version of the application.
+
+\section{Risk Assessment}
+
+The main weakness is that the automated suite is still narrow. It verifies successful flows, but does not yet cover many failure paths. The most important uncovered risk is double booking: the repository contains support for overlap detection, but the service does not enforce it. This means the application may pass the existing tests while still allowing invalid calendar states.
+
+The second relevant risk is input validation. Some invalid inputs are handled indirectly by the web forms or database constraints, but the service layer itself should protect the business rules. Without direct service tests, these cases can remain hidden until they appear as runtime exceptions or inconsistent data.
+
+Overall, the current results are a good baseline for the assignment, but the next iteration should add targeted unit and integration tests around the identified service bugs before expanding the UI tests.

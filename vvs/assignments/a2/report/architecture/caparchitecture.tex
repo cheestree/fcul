@@ -11,3 +11,15 @@ The architecture of the web application follows a layered design pattern, which 
 \end{itemize}
 
 The application also incorporates security features to protect user data and ensure secure access to the application. It uses Spring Security to manage authentication and authorization, allowing users to securely log in and access their calendar events.
+
+\section{Main Components}
+
+The domain model is centered on users, meetings, and meeting participants. A meeting has an organizer and a set of participants. Each participant has an invitation status, allowing the application to distinguish between accepted, pending, and declined invitations. A meeting is considered confirmed only when all participants have accepted it.
+
+The controllers expose the user-facing workflows: registration and login, calendar viewing, meeting proposal, invitation response, event discovery, and iCalendar feed download. These controllers delegate most decisions to services, which makes the service layer the most important target for focused behavioral tests.
+
+\section{External Integrations}
+
+The discovery feature is implemented through a provider abstraction. Ticketmaster and SeatGeek require configuration values, while Agenda Cultural de Lisboa is available through a public endpoint. The \texttt{DiscoveryService} merges provider results, removes duplicates using the event URL when possible, and orders the final list by start time.
+
+The iCalendar integration is generated internally by \texttt{ICalService}. Each user has a private token stored in the database, and the token is used to expose a read-only calendar feed without requiring an authenticated browser session.
