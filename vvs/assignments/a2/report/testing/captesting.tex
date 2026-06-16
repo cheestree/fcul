@@ -1,25 +1,67 @@
 \chapter{Strategy and Testing} \label{cap:testing}
 
-The testing strategy employed for this web application is based on a combination of unit testing, integration testing, and end-to-end testing. This comprehensive approach ensures that all components of the application are thoroughly tested for functionality, reliability, and performance.
+The testing strategy for this web application is organized around the current test suite structure: unit tests for service behavior, REST integration tests for the Spring MVC and security layer, provider integration tests for third-party event discovery, and end-to-end tests for complete user journeys. This gives the project coverage at the most important behavioral boundaries while keeping the tests deterministic and independent from live external services.
 
-When approaching testing, the following thought process was followed:
+\section{Testing Approach}
+
+The suite follows a layered approach:
 \begin{itemize}
-    \item \textbf{Happy Path Testing} - This involves testing the application under normal conditions to ensure that it behaves as expected when provided with valid input. It includes testing the core functionalities of the application, such as creating, reading, updating, and deleting calendar events, as well as searching for relevant events from third-party sources.
-    \item \textbf{Bad Path Testing} - This involves testing the application with invalid input or under abnormal conditions to ensure that it can handle errors gracefully. It includes testing for edge cases, such as empty input, invalid data formats, and unexpected user behavior.
+    \item \textbf{Unit tests} isolate service classes with Mockito. These tests check business rules directly, such as meeting proposal validation, invite status transitions, user registration validation, discovery result merging, iCalendar rendering, and Spring Security user loading.
+    \item \textbf{REST integration tests} start the Spring Boot application context with an H2 in-memory database and use \texttt{MockMvc}. These tests verify controller routes, security behavior, CSRF protection, redirects, model attributes, rendered views, and persistence side effects.
+    \item \textbf{Third-party provider integration tests} replace each provider's HTTP client with a local JSON server. This allows the tests to verify URL query parameters and JSON mapping without depending on Ticketmaster, SeatGeek, or Agenda Cultural de Lisboa being available during the build.
+    \item \textbf{End-to-end tests} are integrated in the suite to validate complete authentication and meeting workflows from the user's perspective.
 \end{itemize}
 
-The testing tools used for this application include JUnit for unit testing, Mockito for mocking dependencies, and H2 database for testing database interactions. H2 was also used to test the application in a production-like environment, ensuring that the application can handle real-world scenarios effectively (as this is also a requirement for the assignment).
+The main tools used are JUnit 5, Mockito, Spring Boot Test, Spring Security Test, MockMvc, and H2. H2 is used by the REST integration tests so that repository operations and transaction behavior are exercised without requiring a separate database server.
 
-To support consistent testing, Continuous Integration (CI) was set up using GitHub Actions. This allows for automated testing whenever changes are made to the codebase, ensuring that any issues are identified and addressed promptly.
+To support consistent testing, Continuous Integration (CI) was set up using GitHub Actions. This allows the same Maven test command to run automatically when changes are made to the codebase.
 
-\section{Current Test Coverage}
+\section{Unit Test Coverage}
 
-The current automated tests focus on end-to-end behavior using Spring Boot, H2, and HtmlUnit. The tests start the application on a random port, use a real web driver to interact with the pages, and verify persistence through the repositories. This gives useful confidence that the main browser flows are wired correctly.
+The unit tests are concentrated in \texttt{src/test/java/unit}. They focus on service logic and avoid loading the full Spring application context.
 
-The covered scenarios include:
+The current unit coverage includes:
 \begin{itemize}
-    \item registering a new user and verifying that the account is persisted;
-    \item signing in and proposing a meeting with another registered user;
-    \item confirming that the organizer is automatically accepted and invitees start as pending;
-    \item accepting a pending invitation and verifying that the meeting becomes confirmed.
+    \item \textbf{MeetingService}: proposing meetings, rejecting invalid titles or times, treating a null invitee list as empty, rejecting unknown invitees, accepting or rejecting invitations, retrieving calendar and pending invite data, and copying discovered events into the calendar.
+    \item \textbf{UserService}: creating users, trimming usernames, rejecting blank usernames and passwords, rejecting duplicate usernames, and reporting unknown users.
+    \item \textbf{DiscoveryService}: returning configured providers, ignoring blank searches, skipping unconfigured providers, deduplicating results, and sorting events by start time.
+    \item \textbf{ICalService}: rendering calendar headers and events, escaping special characters, omitting blank descriptions, mapping participant statuses, and handling null email values.
+    \item \textbf{AppUserDetailsService}: loading Spring Security user details and throwing the expected exception when a username does not exist.
 \end{itemize}
+
+\section{REST Integration Coverage}
+
+The REST integration tests are concentrated in \texttt{src/test/java/integration/rest}. They load the Spring application with an H2 database and use \texttt{MockMvc} to exercise the web layer.
+
+The current REST coverage includes:
+\begin{itemize}
+    \item registration and login flows, including duplicate usernames, invalid credentials, redirects, password hashing, and CSRF rejection;
+    \item meeting proposal and response flows, including participant persistence, accept and decline actions, invalid response actions, and invalid date ranges;
+    \item calendar rendering, including authenticated user data, meetings, pending invites, and generated iCalendar subscription links;
+    \item discovery rendering and copying a discovered event into a user's calendar using a fake configured provider;
+    \item iCalendar feed download, including successful \texttt{text/calendar} output for a valid token and a \texttt{404} response for an unknown token.
+\end{itemize}
+
+\section{Provider Integration Coverage}
+
+The provider integration tests use a lightweight local HTTP server to return controlled JSON responses. This keeps the tests repeatable while still testing the real HTTP request construction and response mapping logic.
+
+The current provider coverage includes:
+\begin{itemize}
+    \item Agenda Cultural de Lisboa response mapping, including occurrence dates, Lisbon timezone conversion, time parsing, venue extraction, and HTML stripping from descriptions;
+    \item SeatGeek response mapping, including client id query parameters and UTC datetime parsing;
+    \item Ticketmaster response mapping, including API key and country query parameters, nested \texttt{\_embedded} event data, venue extraction, and ISO instant parsing.
+\end{itemize}
+
+\section{End-to-End Coverage}
+
+The suite also includes end-to-end coverage for the main user journeys. These tests complement the unit and integration tests by validating the behavior as complete flows rather than isolated classes or controller calls.
+
+The current end-to-end coverage includes:
+\begin{itemize}
+    \item authentication flows, including registration and login behavior;
+    \item meeting flows, including proposing meetings, displaying calendar state, and responding to invitations;
+    \item persistence of user-facing changes across the service and repository layers during the tested workflows.
+\end{itemize}
+
+Together, these tests cover both successful paths and representative bad paths, such as duplicate registration, invalid credentials, missing CSRF tokens, invalid meeting dates, unknown response actions, blank service inputs, unknown invitees, and malformed discovered event intervals.

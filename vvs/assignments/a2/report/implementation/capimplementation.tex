@@ -12,25 +12,13 @@ Events copied from discovery providers are transformed into normal meetings with
 
 The iCalendar renderer writes a calendar document with one event entry per meeting. Meeting confirmation state is mapped to calendar status: confirmed meetings are exported as confirmed, while meetings with pending participants are exported as tentative. Basic escaping is applied to text fields before rendering.
 
-\section{Service-Level Issues Found}
-
-Several issues were identified while inspecting the service and controller boundaries:
+\section{Validation and Error Handling}
 
 \begin{itemize}
-    \item \textbf{Conflict detection is not enforced.} The repository defines an overlap query for calendar conflicts, but the meeting service does not use it when proposing meetings or accepting invitations. As a result, users can create or accept overlapping meetings.
-    \item \textbf{Validation is incomplete in the service layer.} The meeting service checks that the end time is after the start time, but it does not explicitly reject blank titles, null start/end values, or a null invitee list. The user service also accepts blank or whitespace-padded usernames, emails, and passwords.
-    \item \textbf{Registration normalization is missing.} Usernames are checked exactly as submitted. This can lead to inconsistent accounts such as \texttt{alice} and \texttt{ alice }, depending on database constraints and user input.
-    \item \textbf{Discovered event copying trusts provider data.} \texttt{copyFromDiscovered} assumes that the event and start time are present, and it does not validate that a supplied end time is after the start time.
-    \item \textbf{Unexpected response actions become declines.} In the meeting response controller, any action other than \texttt{accept} is mapped to \texttt{DECLINED}. A malformed request should ideally be rejected instead of silently declining an invite.
+    \item \textbf{Meeting validation.} The service rejects missing titles, missing start or end times, and intervals where the end is not after the start. A null invitee list is treated as empty, while individual invitee names are trimmed and deduplicated.
+    \item \textbf{User validation.} Registration trims usernames before checking uniqueness and saving the account. Blank usernames and blank passwords are rejected before password encoding or persistence.
+    \item \textbf{Discovery validation.} Copied discovered events are converted into accepted single-user meetings. When a provider supplies an invalid end time, the service rejects the interval; when no end time is supplied, it applies the default two-hour duration.
+    \item \textbf{Response validation.} The meeting response controller accepts only explicit \texttt{accept} and \texttt{decline} actions. Unknown response actions return a bad request instead of being interpreted as a decline.
 \end{itemize}
 
-\section{Controller-Level Issues Found}
-
-Other issues were found in the controller layer:
-\begin{itemize}
-    \item \textbf{Meeting action defaults to decline.} The meeting response controller does not validate the \texttt{action} parameter, so any value other than \texttt{accept} results in a decline. This can lead to unintended declines if the client sends an unexpected value or if there is a typo in the request.
-\end{itemize}
-
-Both service and controller issues can be resolved by editing one or the other layer, but ideally, most of the simpler validation like checking for blank fields or invalid parameters should be handled in the controller layer to provide immediate feedback to the client, while more complex business rules like conflict detection should be enforced in the service layer to ensure data integrity regardless of how the service is accessed.
-
-This could be implemented by using Jakarta Bean Validation annotations on the controller request parameters to enforce basic validation rules, but instead, due to time constraints and simpler implementation, the service layer was updated to perform additional checks and throw exceptions for invalid input, which are then translated into appropriate HTTP responses by the controller advice.
+This split keeps business validation close to the service methods while still letting the controllers provide appropriate HTTP behavior. The corresponding unit and integration tests exercise these cases directly.

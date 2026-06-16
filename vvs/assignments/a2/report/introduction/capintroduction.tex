@@ -6,7 +6,7 @@ The tests are built with JUnit and Mockito, as well as H2 database for productio
 
 The application under test is a meeting scheduler with authentication, meeting proposals, invitation responses, personal iCalendar feeds, and event discovery through external providers. In practical terms, this means the quality strategy must cover both internal business rules, such as invite status transitions, and integration boundaries, such as database persistence, security redirects, calendar export, and third-party discovery failures.
 
-The main objective of this assignment is not only to demonstrate that the happy path works, but also to identify weak points in the current implementation. For that reason, the report documents existing behavior, the tests that currently protect it, and service-level risks that should guide future test cases and fixes.
+The main objective of this assignment is to demonstrate a structured verification strategy for the application. For that reason, the report documents the implemented behavior, the unit, integration, and end-to-end tests that protect it, and the range of successful and bad-path scenarios covered by the suite.
 
 The report is structured as follows:
 \begin{itemize}
