@@ -21,6 +21,8 @@ The iCalendar renderer writes a calendar document with one event entry per meeti
     \item \textbf{Response validation.} The meeting response controller accepts only explicit \texttt{accept} and \texttt{decline} actions. Unknown response actions return a bad request instead of being interpreted as a decline.
 \end{itemize}
 
+Explicit service-level checks were used instead of introducing Jakarta Bean Validation annotations for these cases because it would deviate from the current design pattern, however it would reduce service clutter due to less explicit validation code. The current design keeps the validation logic close to the service methods, which makes it easier to test and reason about.
+
 This split keeps business validation close to the service methods while still letting the controllers provide appropriate HTTP behavior. The corresponding unit and integration tests exercise these cases directly.
 
 \section{SUT Adaptations}

@@ -18,7 +18,7 @@ To support consistent testing, Continuous Integration (CI) was set up using GitH
 
 \section{Test Design Process}
 
-The tests were created feature by feature. For each feature, the expected behavior was tested to confirm that the intended flow was present. After that, testes were added for error situations that already existed in the application, such as invalid credentials, duplicate registration, invalid meeting dates, missing CSRF tokens, unknown invitees, and invalid response actions.
+The tests were created feature by feature. For each feature, the expected behavior was tested to confirm that the intended flow was present. After that, tests were added for error situations that already existed in the application, such as invalid credentials, duplicate registration, invalid meeting dates, missing CSRF tokens, unknown invitees, and invalid response actions.
 
 Once the main success and error paths were covered, the relevant input fields and service parameters for each feature were reviewed. When a field could receive malformed or missing data, tests for that case were added and the implementation was adjusted when the behavior was unsafe or unclear. This is how validation cases such as blank usernames, blank passwords, missing meeting titles, null dates, null invitee lists, and malformed discovered-event intervals were added to the suite.
 
