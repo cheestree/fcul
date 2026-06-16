@@ -2,6 +2,6 @@
 
 The application implements the main functionality expected from a small meeting scheduler: users can register, propose meetings, respond to invitations, view their calendar, copy discovered events, and export a personal iCalendar feed. The current test suite confirms this behavior across unit, integration, provider, and end-to-end levels.
 
-The suite covers a range of successful and bad-path scenarios, including validation errors, duplicate registration, invalid credentials, CSRF protection, invalid meeting intervals, unknown invite response actions, provider response mapping, and iCalendar feed generation. This gives the project a balanced verification base across business logic, web behavior, persistence, and external API boundaries.
+The suite covers a range of successful and unsuccessful scenarios, including validation errors, duplicate registration, invalid credentials, CSRF protection, invalid meeting intervals, unknown invite response actions, provider response mapping, and iCalendar feed generation. This gives the project a broad verification base across business logic, web behavior, persistence, and external API boundaries.
 
 Future additions can continue the same structure by adding cases as new features are introduced. The existing organization makes that straightforward: business rules can be added to unit tests, HTTP behavior to REST integration tests, provider mappings to local-server integration tests, and complete user journeys to the end-to-end layer.

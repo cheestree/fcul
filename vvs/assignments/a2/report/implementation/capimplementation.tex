@@ -22,3 +22,15 @@ The iCalendar renderer writes a calendar document with one event entry per meeti
 \end{itemize}
 
 This split keeps business validation close to the service methods while still letting the controllers provide appropriate HTTP behavior. The corresponding unit and integration tests exercise these cases directly.
+
+\section{SUT Adaptations}
+
+The assignment allowed changes to the system under test when needed to implement a meaningful test suite. The following adaptations were made:
+
+\begin{itemize}
+    \item \textbf{Meeting service validation.} \texttt{MeetingService} now rejects missing titles, missing start or end times, and intervals where the end is not after the start. It also treats a null invitee list as empty and validates copied discovered-event intervals. These checks were added so invalid data is rejected consistently at the business-logic boundary and can be tested directly.
+    \item \textbf{User service validation.} \texttt{UserService} now trims usernames before lookup and persistence, rejects blank usernames, and rejects blank passwords. This prevents malformed accounts from being saved and gives the unit and REST tests deterministic validation behavior.
+    \item \textbf{Meeting response validation.} \texttt{MeetingController} now accepts only explicit \texttt{accept} and \texttt{decline} actions. Unknown actions return \texttt{400 Bad Request} instead of being silently interpreted as a decline. This change avoids accidental destructive state changes from malformed requests.
+    \item \textbf{Test dependencies and execution support.} The Maven configuration was extended with Spring Boot Test, Spring Security Test, and HtmlUnit/Selenium support so the project can run unit, REST integration, and end-to-end tests through Maven.
+    \item \textbf{Continuous Integration.} A GitHub Actions workflow was added to run \texttt{mvn -B clean test} on pushes to \texttt{main} and on pull requests.
+\end{itemize}

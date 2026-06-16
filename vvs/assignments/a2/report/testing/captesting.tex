@@ -12,9 +12,28 @@ The suite follows a layered approach:
     \item \textbf{End-to-end tests} are integrated in the suite to validate complete authentication and meeting workflows from the user's perspective.
 \end{itemize}
 
-The main tools used are JUnit 5, Mockito, Spring Boot Test, Spring Security Test, MockMvc, and H2. H2 is used by the REST integration tests so that repository operations and transaction behavior are exercised without requiring a separate database server.
+The main tools used are JUnit 5, Mockito, Spring Boot Test, Spring Security Test, MockMvc, Selenium through HtmlUnitDriver, and H2. H2 is used by the REST integration tests and by the end-to-end tests so that repository operations and transaction behavior are exercised with a concrete database that is separate from the production database.
 
 To support consistent testing, Continuous Integration (CI) was set up using GitHub Actions. This allows the same Maven test command to run automatically when changes are made to the codebase.
+
+\section{Test Design Process}
+
+The tests were created feature by feature. For each feature, the expected behavior was tested to confirm that the intended flow was present. After that, testes were added for error situations that already existed in the application, such as invalid credentials, duplicate registration, invalid meeting dates, missing CSRF tokens, unknown invitees, and invalid response actions.
+
+Once the main success and error paths were covered, the relevant input fields and service parameters for each feature were reviewed. When a field could receive malformed or missing data, tests for that case were added and the implementation was adjusted when the behavior was unsafe or unclear. This is how validation cases such as blank usernames, blank passwords, missing meeting titles, null dates, null invitee lists, and malformed discovered-event intervals were added to the suite.
+
+\section{Assignment Requirements Mapping}
+
+The implemented suite maps to the assignment requirements as follows:
+
+\begin{itemize}
+    \item \textbf{Mocks:} unit tests use Mockito to isolate services from repositories and providers.
+    \item \textbf{Third-party integrations:} use local JSON servers to test provider HTTP requests and response mapping without relying on live external APIs.
+    \item \textbf{REST API integration tests:} use \texttt{MockMvc} against the Spring MVC and security configuration.
+    \item \textbf{Integration tests with a concrete database:} implemented by the REST and end-to-end support classes, which configure H2 in-memory databases with \texttt{create-drop} schema management instead of using the production database.
+    \item \textbf{E2E tests:} use Selenium's \texttt{HtmlUnitDriver}, a random-port Spring Boot server, and an H2 test database.
+    \item \textbf{Continuous Integration:} implemented with a GitHub Actions workflow that runs \texttt{mvn -B clean test}.
+\end{itemize}
 
 \section{Unit Test Coverage}
 
@@ -64,4 +83,4 @@ The current end-to-end coverage includes:
     \item persistence of user-facing changes across the service and repository layers during the tested workflows.
 \end{itemize}
 
-Together, these tests cover both successful paths and representative bad paths, such as duplicate registration, invalid credentials, missing CSRF tokens, invalid meeting dates, unknown response actions, blank service inputs, unknown invitees, and malformed discovered event intervals.
+Together, these tests cover both successful and unsuccessful paths, such as duplicate registration, invalid credentials, missing CSRF tokens, invalid meeting dates, unknown response actions, blank service inputs, unknown invitees, and malformed discovered event intervals.

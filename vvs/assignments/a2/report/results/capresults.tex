@@ -6,10 +6,35 @@ The existing automated tests validate the application at multiple levels. Unit t
 
 The tested flows show that the application can create accounts, authenticate users, persist meetings, assign invitation statuses, update a meeting from pending to confirmed after acceptance, render calendar views, export iCalendar feeds, and copy discovered events into a user's calendar.
 
+The full Maven test command was executed successfully:
+
+\begin{center}
+\texttt{mvn -B test}
+\end{center}
+
+The final result was 69 tests executed, with 0 failures, 0 errors, and 0 skipped tests.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|r|r|r|r|}
+\hline
+\textbf{Test group} & \textbf{Tests} & \textbf{Failures} & \textbf{Errors} & \textbf{Skipped} \\
+\hline
+Unit tests & 36 & 0 & 0 & 0 \\
+REST integration tests & 21 & 0 & 0 & 0 \\
+Third-party provider integration tests & 3 & 0 & 0 & 0 \\
+End-to-end tests & 9 & 0 & 0 & 0 \\
+\hline
+\textbf{Total} & \textbf{69} & \textbf{0} & \textbf{0} & \textbf{0} \\
+\hline
+\end{tabular}
+\caption{Automated test results from the Maven test run.}
+\end{table}
+
 \section{Coverage Results}
 
-The suite covers both successful behavior and representative bad paths. Registration tests verify successful account creation, duplicate username handling, invalid login handling, password hashing, and CSRF protection. Meeting tests verify successful proposals, accepted and declined responses, invalid response actions, and invalid time intervals. Service tests add direct coverage for blank input, null values, unknown invitees, invalid discovered event intervals, and invalid invite statuses.
+The suite covers both successful (like successful login and registration) and unsuccessful paths and behavior (like failed login attempts). Registration tests verify successful account creation, duplicate username handling, invalid login handling, password hashing, and CSRF protection. Meeting tests verify successful proposals, accepted and declined responses, invalid response actions, and invalid time intervals. Service tests add direct coverage for blank input, null values, unknown invitees, invalid discovered event intervals, and invalid invite statuses.
 
 The provider tests show that each discovery integration can map controlled API responses into the internal \texttt{DiscoveredEvent} representation. This includes query construction, date and time parsing, venue extraction, description cleanup, and provider-specific nested JSON structures.
 
-The end-to-end portion of the suite is also integrated into the Maven test reports. The available reports show the authentication E2E test set running 4 tests with 0 failures and the meeting-flow E2E test set running 5 tests with 0 failures. This confirms that the core user journeys are exercised in addition to the lower-level unit and integration coverage.
+The end-to-end portion of the suite is also integrated into the Maven test reports. The reports show the authentication E2E test set running 4 tests with 0 failures and the meeting-flow E2E test set running 5 tests with 0 failures. This confirms that the core user journeys are exercised in addition to the lower-level unit and integration coverage.

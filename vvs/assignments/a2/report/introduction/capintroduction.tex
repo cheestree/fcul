@@ -1,18 +1,18 @@
 \chapter{Introduction} \label{cap:intro}
 
-This report presents the test implementation and evaluation of a web application designed to manage calendar events and search relevant events from third-party sources. The application is built using the Spring Boot framework and incorporates various features to enhance user experience and functionality.
+This report presents the test implementation and evaluation of a web application designed to manage calendar events and search relevant events from third-party sources. The application is built using the Spring Boot framework and supports user registration, meeting proposals, invitation responses, calendar export, and event discovery.
 
-The tests are built with JUnit and Mockito, as well as H2 database for production/testing purposes. The testing strategy includes unit tests, integration tests, and end-to-end tests to ensure the reliability and robustness of the application.
+The tests are built with JUnit and Mockito, as well as H2 database, with separate configurations for production and testing. The testing strategy includes unit tests, integration tests, and end-to-end tests to confirm that the application behaves as expected under various conditions.
 
 The application under test is a meeting scheduler with authentication, meeting proposals, invitation responses, personal iCalendar feeds, and event discovery through external providers. In practical terms, this means the quality strategy must cover both internal business rules, such as invite status transitions, and integration boundaries, such as database persistence, security redirects, calendar export, and third-party discovery failures.
 
-The main objective of this assignment is to demonstrate a structured verification strategy for the application. For that reason, the report documents the implemented behavior, the unit, integration, and end-to-end tests that protect it, and the range of successful and bad-path scenarios covered by the suite.
+The main objective of this assignment is to demonstrate a structured test implementation strategy. For that reason, the report documents the implemented behavior, the unit, integration, and end-to-end tests that protect it, and the range of successful and unsuccessful scenarios covered by the suite.
 
 The report is structured as follows:
 \begin{itemize}
     \item Chapter 2: System Architecture - This chapter describes the overall architecture of the application.
     \item Chapter 3: Implementation Details - This chapter provides insights into the implementation of each component of the application.
     \item Chapter 4: Strategy and Testing - This chapter outlines the testing methodologies and tools used to ensure the quality of the application.
-    \item Chapter 5: Evaluation and Results - This chapter presents the results of the tests conducted and evaluates the performance and reliability of the application.
+    \item Chapter 5: Evaluation and Results - This chapter presents the results of the tests conducted and summarizes the test results and the behavior covered by the suite.
     \item Chapter 6: Conclusion - This chapter summarizes the findings and discusses potential future improvements for the application.
 \end{itemize}
