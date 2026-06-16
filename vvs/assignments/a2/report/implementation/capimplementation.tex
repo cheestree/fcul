@@ -4,6 +4,8 @@
 
 The core meeting workflow is implemented in \texttt{MeetingService}. When a user proposes a meeting, the service creates a \texttt{Meeting} entity and immediately adds the organizer as an accepted participant. Each invited username is trimmed, empty values are ignored, duplicate invitees are skipped, and unknown invitees cause the operation to fail.
 
+The meeting proposal workflow also checks for duplicate overlapping meetings. Two meetings may overlap in time on the same user's calendar when they represent different events. However, if an overlapping meeting already exists with the same title, ignoring case and surrounding whitespace, the proposal is rejected. This prevents accidental duplicate submissions while still allowing a user to keep distinct events that happen at the same or partially overlapping times.
+
 Invitation responses are represented by the \texttt{InviteStatus} enum. The service only accepts \texttt{ACCEPTED} or \texttt{DECLINED} as valid responses. Calendar queries exclude declined invitations for the invitee, which means a declined meeting no longer blocks that user's calendar, while the organizer can still see the meeting they created.
 
 \section{Discovery and Calendar Export}
@@ -15,7 +17,7 @@ The iCalendar renderer writes a calendar document with one event entry per meeti
 \section{Validation and Error Handling}
 
 \begin{itemize}
-    \item \textbf{Meeting validation.} The service rejects missing titles, missing start or end times, and intervals where the end is not after the start. A null invitee list is treated as empty, while individual invitee names are trimmed and deduplicated.
+    \item \textbf{Meeting validation.} The service rejects missing titles, missing start or end times, and intervals where the end is not after the start. A null invitee list is treated as empty, while individual invitee names are trimmed and deduplicated. It also rejects duplicate overlapping meetings with the same title for any affected participant, while still allowing overlapping meetings with different titles.
     \item \textbf{User validation.} Registration trims usernames before checking uniqueness and saving the account. Blank usernames and blank passwords are rejected before password encoding or persistence.
     \item \textbf{Discovery validation.} Copied discovered events are converted into accepted single-user meetings. When a provider supplies an invalid end time, the service rejects the interval; when no end time is supplied, it applies the default two-hour duration.
     \item \textbf{Response validation.} The meeting response controller accepts only explicit \texttt{accept} and \texttt{decline} actions. Unknown response actions return a bad request instead of being interpreted as a decline.
@@ -31,6 +33,7 @@ The assignment allowed changes to the system under test when needed to implement
 
 \begin{itemize}
     \item \textbf{Meeting service validation.} \texttt{MeetingService} now rejects missing titles, missing start or end times, and intervals where the end is not after the start. It also treats a null invitee list as empty and validates copied discovered-event intervals. These checks were added so invalid data is rejected consistently at the business-logic boundary and can be tested directly.
+    \item \textbf{Duplicate overlapping meeting hotfix.} A bug was identified where the calendar could accept duplicate meetings with the same title in overlapping time intervals. The fix uses the existing overlapping-meeting repository query and rejects only overlapping meetings whose titles match, ignoring case and surrounding whitespace. Overlapping meetings with different titles remain valid.
     \item \textbf{User service validation.} \texttt{UserService} now trims usernames before lookup and persistence, rejects blank usernames, and rejects blank passwords. This prevents malformed accounts from being saved and gives the unit and REST tests deterministic validation behavior.
     \item \textbf{Meeting response validation.} \texttt{MeetingController} now accepts only explicit \texttt{accept} and \texttt{decline} actions. Unknown actions return \texttt{400 Bad Request} instead of being silently interpreted as a decline. This change avoids accidental destructive state changes from malformed requests.
     \item \textbf{Test dependencies and execution support.} The Maven configuration was extended with Spring Boot Test, Spring Security Test, and HtmlUnit/Selenium support so the project can run unit, REST integration, and end-to-end tests through Maven.

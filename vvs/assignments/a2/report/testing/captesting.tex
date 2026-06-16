@@ -22,6 +22,8 @@ The tests were created feature by feature. For each feature, the expected behavi
 
 Once the main success and error paths were covered, the relevant input fields and service parameters for each feature were reviewed. When a field could receive malformed or missing data, tests for that case were added and the implementation was adjusted when the behavior was unsafe or unclear. This is how validation cases such as blank usernames, blank passwords, missing meeting titles, null dates, null invitee lists, and malformed discovered-event intervals were added to the suite.
 
+After reviewing the calendar behavior, an additional defect was found in the meeting proposal workflow: overlapping meetings were not distinguished from accidental duplicate submissions. The intended behavior is to allow overlapping calendar entries when their titles are different, but to reject an overlapping entry with the same title. The hotfix was covered by two new \texttt{MeetingService} unit tests and two new \texttt{MeetingControllerIntegrationTest} REST integration tests.
+
 \section{Assignment Requirements Mapping}
 
 The implemented suite maps to the assignment requirements as follows:
@@ -41,7 +43,7 @@ The unit tests are concentrated in \texttt{src/test/java/unit}. They focus on se
 
 The current unit coverage includes:
 \begin{itemize}
-    \item \textbf{MeetingService}: proposing meetings, rejecting invalid titles or times, treating a null invitee list as empty, rejecting unknown invitees, accepting or rejecting invitations, retrieving calendar and pending invite data, and copying discovered events into the calendar.
+    \item \textbf{MeetingService}: proposing meetings, rejecting invalid titles or times, treating a null invitee list as empty, rejecting unknown invitees, accepting or rejecting invitations, retrieving calendar and pending invite data, copying discovered events into the calendar, allowing overlapping meetings with different titles, and rejecting overlapping meetings with the same title.
     \item \textbf{UserService}: creating users, trimming usernames, rejecting blank usernames and passwords, rejecting duplicate usernames, and reporting unknown users.
     \item \textbf{DiscoveryService}: returning configured providers, ignoring blank searches, skipping unconfigured providers, deduplicating results, and sorting events by start time.
     \item \textbf{ICalService}: rendering calendar headers and events, escaping special characters, omitting blank descriptions, mapping participant statuses, and handling null email values.
@@ -55,7 +57,7 @@ The REST integration tests are concentrated in \texttt{src/test/java/integration
 The current REST coverage includes:
 \begin{itemize}
     \item registration and login flows, including duplicate usernames, invalid credentials, redirects, password hashing, and CSRF rejection;
-    \item meeting proposal and response flows, including participant persistence, accept and decline actions, invalid response actions, and invalid date ranges;
+    \item meeting proposal and response flows, including participant persistence, accept and decline actions, invalid response actions, invalid date ranges, allowed overlapping meetings with different titles, and rejected overlapping meetings with the same title;
     \item calendar rendering, including authenticated user data, meetings, pending invites, and generated iCalendar subscription links;
     \item discovery rendering and copying a discovered event into a user's calendar using a fake configured provider;
     \item iCalendar feed download, including successful \texttt{text/calendar} output for a valid token and a \texttt{404} response for an unknown token.

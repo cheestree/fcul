@@ -6,34 +6,35 @@ The existing automated tests validate the application at multiple levels. Unit t
 
 The tested flows show that the application can create accounts, authenticate users, persist meetings, assign invitation statuses, update a meeting from pending to confirmed after acceptance, render calendar views, export iCalendar feeds, and copy discovered events into a user's calendar.
 
-The full Maven test command was executed successfully:
+By running the following command, the test suite executes and generates reports based on the pass/fail/skipped status of each test case:
 
 \begin{center}
 \texttt{mvn -B test}
 \end{center}
 
-The final result was 69 tests executed, with 0 failures, 0 errors, and 0 skipped tests.
-
 \begin{table}[H]
 \centering
-\begin{tabular}{|l|r|r|r|r|}
+\begin{tabular}{|l|r|r|r|r|r|}
 \hline
-\textbf{Test group} & \textbf{Tests} & \textbf{Failures} & \textbf{Errors} & \textbf{Skipped} \\
+\textbf{Component} & \textbf{Unit} & \textbf{REST} & \textbf{Third-party} & \textbf{E2E} & \textbf{Total} \\
 \hline
-Unit tests & 36 & 0 & 0 & 0 \\
-REST integration tests & 21 & 0 & 0 & 0 \\
-Third-party provider integration tests & 3 & 0 & 0 & 0 \\
-End-to-end tests & 9 & 0 & 0 & 0 \\
+Authentication and users & 10 & 9 & 0 & 4 & 23 \\
+Meeting and calendar workflow & 18 & 9 & 0 & 5 & 32 \\
+Discovery and providers & 5 & 3 & 3 & 0 & 11 \\
+iCalendar export & 5 & 2 & 0 & 0 & 7 \\
 \hline
-\textbf{Total} & \textbf{69} & \textbf{0} & \textbf{0} & \textbf{0} \\
+\textbf{Total} & \textbf{38} & \textbf{23} & \textbf{3} & \textbf{9} & \textbf{73} \\
 \hline
 \end{tabular}
-\caption{Automated test results from the Maven test run.}
+\caption{Automated test cases by component and test type.}
+\label{tab:test-coverage}
 \end{table}
+
+As seen in the table \ref{tab:test-coverage}, the suite includes 38 unit tests, 23 REST integration tests, 3 third-party provider integration tests, and 9 end-to-end tests, for a total of 73 automated test cases. The authentication and user management component has strong coverage across all test types, while the meeting and calendar workflow has a particularly high number of unit tests due to its complexity. The discovery and provider integrations have fewer tests overall but include specific cases for mapping third-party responses. The iCalendar export component is covered primarily by unit and REST tests.
 
 \section{Coverage Results}
 
-The suite covers both successful (like successful login and registration) and unsuccessful paths and behavior (like failed login attempts). Registration tests verify successful account creation, duplicate username handling, invalid login handling, password hashing, and CSRF protection. Meeting tests verify successful proposals, accepted and declined responses, invalid response actions, and invalid time intervals. Service tests add direct coverage for blank input, null values, unknown invitees, invalid discovered event intervals, and invalid invite statuses.
+The suite covers both successful (like successful login and registration) and unsuccessful paths and behavior (like failed login attempts). Registration tests verify successful account creation, duplicate username handling, invalid login handling, password hashing, and CSRF protection. Meeting tests verify successful proposals, accepted and declined responses, invalid response actions, invalid time intervals, and overlapping meetings. Service tests add direct coverage for blank input, null values, unknown invitees, invalid discovered event intervals, invalid invite statuses, allowed overlapping meetings with different titles, and rejected overlapping meetings with the same title.
 
 The provider tests show that each discovery integration can map controlled API responses into the internal \texttt{DiscoveredEvent} representation. This includes query construction, date and time parsing, venue extraction, description cleanup, and provider-specific nested JSON structures.
 
