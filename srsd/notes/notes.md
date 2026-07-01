@@ -151,6 +151,7 @@ Counter with Cipher Block Chaining Message Authentication Code (CCM):
 ## Authentication and Key Distribution (Simple Protocols)
 
 **Unilateral authentication**:
+
 - only one party is authenticated to the other party.
     Example: a client authenticates to a server using a password.
 - the password sent can be vulnerable to eavesdropping, and then the attacker can impersonate the client to the server/other client.
@@ -184,4 +185,103 @@ Counter with Cipher Block Chaining Message Authentication Code (CCM):
 - personify attack vulnerable if the other party is convinced to set their clock to a time in the past, and then the adversary can replay the messages to one of the parties.
 - clock sync needs to be done securely (not always possible).
 
-  **if public key**:
+**Unilateral authentication with public key**:
+
+- database of public keys can be public, but needs to be to protect against changes.
+- if user sends:
+  - a message encrypted with the other party's public key, the other party can decrypt it, but the adversary can make the other party decrypt arbitrary data encrypted previously with the other party's public key.
+  - a challenge, the other party can respond with an encrypted response, but it can be intercepted and personify the other party.
+
+**Mutual authentication**:
+
+- can be a 5, 4 or 3 message protocol if using a public key.
+- both parties are authenticated to each other.
+  **5 message protocol**:
+- they receive a challenge from the other party, and respond with a response that is computed using the shared secret and the challenge, as well as a challenge for the other party to respond to.
+- the second party can verify the response from the first party, and respond with a response that is computed using the shared secret and the challenge from the first party.
+  **3 message protocol**:
+- a party sends the message and the challenge to the other party, and the other party responds with a response that is computed using the shared secret and the challenge, as well as a challenge for the first party to respond to.
+- the second party can verify the response from the first party, and respond with a response that is computed using the shared secret and the challenge from the first party.
+- vulnerable to reflection attacks. The adversary contacts a party and receives a new challenge and the encrypted previous one. They can create a parallel session with the other party and send the received challenge to the other party, and then respond to the party with the response from the new session. The other party will verify the response and confirm authentication.
+- can be avoided by using different keys for the two parties/by deriving a key from the key used to authenticate one of the parties or different challenges with different formats for the two parties.
+ **4 message protocol**:
+- the party that initiates the protocol should prove its identity first, and then the other party should prove its identity.
+- a message is sent, the other party responds with a challenge, and the first party responds with a response that is computed using the shared secret and the challenge, as well as a challenge for the other party to respond to. The other party then responds with a response that is computed using the shared secret and the challenge from the first party.
+
+**Mutual authentication with a timestamp**:
+
+- ASSUMES SYNCHRONIZED CLOCKS
+- a party sends a message with an encrypted timestamp to the other party, and the other party responds with a message with an encrypted, incremented, timestamp to the first party. The first party can verify the timestamp from the second party, and the second party can verify the timestamp from the first party.
+- personify attack vulnerable if the key is intercepted and immediately replayed to another party. Avoid with encryption of the other party identifier and timestamp.
+
+**Mutual authentication with a public key**:
+
+- public keys need to be obtained from a trusted source.
+- private keys need to be obtained from a trusted source and kept secret.
+- a solution would be encrypting one party's private key with a key derived from the password and save it with the second party, while encrypting the second party's certificate containing their public key and the first party's private key.
+
+**Mediated authentication**:
+
+- a Key Distribution Center (KDC) is a trusted third party that generates and distributes session keys to the parties that want to communicate securely.
+- a party sends a message requesting a session key between them and the other party to the KDC, and the KDC generates a session key and sends it to both parties, encrypted with their respective shared secrets and identifiers. The parties can then use the session key to communicate securely.
+
+- instead of the KDC sending the session key to both parties, it can send the session key to the party that requested it, but CAN be nested encrypted, so that the other party can decrypt it with their shared secret and identifier. The key sent to the other party is called the ticket.
+
+**Key Distribution**:
+
+- generation of a refreshed session key can be based on the previous session key and something related to the long-term shared key. Avoid having the shared key being the encrypted challenge or an incremented version of the challenge.
+
+## Authentication handshakes
+
+**Mutual Authentication and Session Key Establishment**:
+
+- after authentication, the messages use the session key + encryption + MAC for confidentiality and integrity (avoids session hijacking) or a sequence number (avoids replay and reording attacks).
+
+**PFS (Perfect Forward Secrecy)**:
+
+- a property of secure communication protocols in which the compromise of long-term keys does not compromise past session keys.
+- achieved by generating a new session key for each session based on local information (forgotten after the session terminates), and not deriving the session key from the long-term keys.
+- recommended to periodically refresh the temporary key in the same session.
+- protects against long-term key compromise, as the adversary cannot use the compromised long-term keys to decrypt past communications (can only listen to the network). Important for escrow systems (third-party hold the keys for decryption).
+
+**Denial of Service Protection**:
+
+- a property of secure communication protocols in which the protocol is designed to prevent or mitigate denial-of-service (DoS) attacks, which are attempts to make a network service unavailable to its intended users.
+- uses cookies to verify the identity of the client before allocating resources for the session. The server sends a cookie to the client, which the client must return in subsequent messages to prove its identity.
+- can also use puzzles to require the client to perform a computationally expensive operation before allocating resources for the session. The server sends a puzzle to the client, which the client must solve and return in subsequent messages to prove its identity.
+
+**Identity Hiding**:
+
+- a property of secure communication protocols in which the protocol is designed to protect the identity of the parties involved in the communication from both passive (observing the network) and active (intercepting and modifying messages) adversaries.
+- anonymous Diffie-Hellman helps with passive attacks but vulnerable to MITM attacks.
+- another method works by generating a public DH key, sending to the other party, receiving an OK with the other party's public DH key, and then sending an encrypted message using the calculated shared secret with the identity and encrypted private key of the first party. authenticating itself. The other party responds similarly, authenticating itself.
+
+**Live Partner Reassurance**:
+
+- allow the reuse of DH parameter on B side to improve efficiency and protect against replay attacks.
+- a nonce is used when calculating the new shared secret to ensure that the new shared secret is different from the previous one, even if the same DH parameters are used. The nonce is generated by one party and sent to the other party, which uses it in the calculation of the new shared secret.
+
+## Password base Network Authentication
+
+Sending password through the network - eavesdropping
+Anonymous DH and encrypt password with resulting key - MITM
+Save one party's public key locally and then use it to create the secure channel - substitute public key
+Create a hash of the password to obtain the key and then use of the symmetric key authentication protocols - dictionary attack
+
+**Lanport Hash**:
+
+- each authentication uses different passwords based on hashed values.
+- improved if other fields are used like the password, salt and the other party's identifier.
+
+**SIM swapping**:
+- an attack in which an attacker convinces a mobile carrier to transfer the victim's phone number to a SIM card controlled by the attacker. The attacker can then use the victim's phone number to receive authentication codes sent via SMS, allowing them to bypass two-factor authentication and gain access to the victim's accounts.
+
+**2FA (Two-Factor Authentication)**:
+- uses HMAC OTP or Time-based OTP to generate a one-time password that is valid for a short period of time. The user must provide both their password and the one-time password to authenticate.
+
+**EKE (Encrypted Key Exchange)**:
+- one party sends their identity and an encrypted value, via the hash generated from their password, that is unique to them. The other, knowing the expected hash, chooses the nonce and another value from Diffie-Hellman, and sends it back encrypted with the hash. The first party can then compute the shared secret and send it back encrypted with the new calculated hash and both the old and generated nonces. Lastly, the second party computes the nonces.
+- avoids brute-force attacks.
+- vulnerable to sophisticated attacks.
+
+**SRP (Secure Remote Password)**:
