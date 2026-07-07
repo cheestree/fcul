@@ -28,3 +28,6 @@
 [submodule "cn/project"]
 	path = cn/project
 	url = git@github.com:cheestree/comp-nuvem-2026.git
+[submodule "vvs/assignments/a2/project"]
+	path = vvs/assignments/a2/project
+	url = https://github.com/cheestree/calendar
