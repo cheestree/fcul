@@ -26,18 +26,22 @@
     \begin{abstract}
         Biological Control Agents (BCAs) provide an increasingly important alternative to conventional chemical
         plant protection products.
+
         However, information regarding their applicability to specific crop-pathogen
         combinations remains fragmented across diverse regulatory and agricultural data sources.
-        This fragmentation,
-        together with inconsistencies in terminology and data representation, makes the identification of suitable
-        BCAs difficult and limits the development of automated decision-support systems.
+
+        This fragmentation, together with inconsistencies in terminology and data representation, makes the
+        identification of suitable BCAs difficult and limits the development of automated decision-support systems.
+
         This work presents the approach for identifying biological control agents for crop-pathogen combinations, with data integration and a recommendation system.
         Data from sources like Portugal's SIFITO and the EU's database for pesticides is collected, normalized, and
         integrated into a unified representation connecting crops, target organisms, authorized products and active
         substances.
+
         Based on these relationships, a collaborative filtering approach is used to allow for visualization of a given pair.
         The proposed approach is evaluated using a verified dataset as a
-        single-source-of-truth and assessing whether a crop-pathogen pair has a corresponding BCA and able to recover known associations. Results show that, for the integrated data and model created,
+        single-source-of-truth and assessing whether a crop-pathogen pair has a corresponding BCA and able to recover known associations.
+        %% MISSING RESULTS
 
     \end{abstract}
 
@@ -49,25 +53,61 @@
     \section{Background and Context}\label{sec:background-and-context}
 
     Agricultural production is continuously affected by pests and plant diseases which contribute substantially to
-    crop losses worldwide. Crop protection has therefore become an essential component of modern agricultural
+    crop losses worldwide.
+
+    Crop protection has therefore become an essential component of modern agricultural
     production, with chemical pesticides remaining one of the primary mechanisms for controlling harmful organisms.
+
     Despite their effectiveness, extensive reliance on chemical plant protection products raises concerns regarding
     soil quality, pathogen resistance, crop quality and animal population.
+
     These concerns, together with increasing demand for sustainable agricultural practices, have motivated the
     development and adoption of alternative crop-protection strategies.
 
 
     \section{Motivation and Project Framing}\label{sec:motivation-and-project-framing}
 
+    Although information regarding BCAs and their authorized uses is available through existing regulatory
+    resources, identifying suitable biological control options for a particular crop-pathogen combination remains a
+    non-trivial task.
+    Relevant information is distributed across many sources that differ in structure, terminology
+    and scope.
+
+    Furthermore, these systems are primarily designed to expose regulatory or production information
+    rather than to support the discovery of biological control alternatives for a given agricultural problem.
+    This motivates treating BCA identification as a recommendation problem.
+
+    Rather than requiring users to manually
+    navigate individual products and regulatory records, known relationships between crops, pathogens, products and
+    active substances can be represented and exploited to rank candidate biological control options fora given
+    crop-pathogen pair.
+
 
     \section{Research Goals}\label{sec:research-goals}
+
+    The primary goal of this work is to investigate whether heterogeneous agricultural and regulatory data can be integrated and exploited to support the recommendation of Biological Control Agents for crop-pathogen combinations.
+    To address this objective, the project is structured around the following goals.
+
+    First, the work aims to unify data collected from heterogeneous sources into a common and consistent representation.
+    These sources may differ in structure, terminology, naming conventions, and level of detail, requiring the normalization of crops, pathogens, products, active substances, and their corresponding relationships.
+    The resulting representation should provide a suitable basis for both analysis and recommendation.
+
+    Second, a recommendation model is developed to identify candidate BCAs for a given crop-pathogen combination.
+    The model exploits relationships between known crop-pathogen pairs and the biological control options associated with similar combinations, allowing relevant candidates to be ranked according to the information available in the integrated dataset.
+
+    Third, the effectiveness of the recommendation approach is evaluated using independently verified crop-pathogen-BCA associations.
+    This evaluation aims to determine whether the model is capable of recovering known associations and ranking relevant biological control options among its recommendations.
+
+    A further goal is to support the continuous incorporation of newly available data.
+    New records should pass through the same filtering, normalization, and validation pipeline before being incorporated into the recommendation dataset.
+    Following these updates, the model can be retrained and reevaluated to determine whether recommendation performance remains consistent as the underlying data evolves.
+
+    Finally, the resulting recommendation system is intended to be integrated into the PlantPathoRec platform, allowing the developed approach to be exposed as part of a broader decision-support environment for plant pathology and crop protection.
 
 
     \section{Methodology or Approach}\label{sec:methodology-or-approach}
 
-
     \subsection{Data Sources and Data Integration}\label{subsec:data-sources-and-data-integration}
-
 
     \subsection{Recommendation Methodology}\label{subsec:recommendation-methodology}
 
