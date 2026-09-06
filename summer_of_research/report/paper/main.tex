@@ -1,16 +1,27 @@
 \documentclass[sigconf]{acmart}
 
-\title{A Recommender System for Biological Control Agents in Agriculture}
+\AtBeginDocument{%
+    \providecommand\BibTeX{{%
+        Bib\TeX}}}
 
-\author{Daniel Carvalho, Márcia Barros}
-\affiliation{%
-    \institution{FCUL}
-    \city{Lisbon}
-    \country{Portugal}
-}
-\email{daniel.mq.carvalho@gmail.com}
+\setcopyright{none}
+\settopmatter{printacmref=false}
+\renewcommand\footnotetextcopyrightpermission[1]{}
 
 \begin{document}
+
+    \title{A Recommender System for Biological Control Agents in Agriculture}
+
+    \author{Daniel Carvalho}
+    \email{daniel.mq.carvalho@gmail.com}
+    \author{Márcia Barros}
+    \email{marcia.c.a.barros@gmail.com}
+    \affiliation{%
+        \institution{FCUL}
+        \city{Lisbon}
+        \country{Portugal}
+    }
+    \renewcommand{\shortauthors}{Carvalho and Barros}
 
     \begin{abstract}
         Biological Control Agents (BCAs) provide an increasingly important alternative to conventional chemical
@@ -30,10 +41,12 @@
 
     \end{abstract}
 
+    \keywords{biological control agents, crop protection, recommender systems, data integration, plant pathogens}
+
     \maketitle
 
 
-    \section{Introduction}\label{sec:introduction}
+    \section{Background and Context}\label{sec:background-and-context}
 
     Agricultural production is continuously affected by pests and plant diseases which contribute substantially to
     crop losses worldwide. Crop protection has therefore become an essential component of modern agricultural
@@ -44,25 +57,31 @@
     development and adoption of alternative crop-protection strategies.
 
 
-    \section{Background and Related Work}\label{sec:background-and-related-work}
+    \section{Motivation and Project Framing}\label{sec:motivation-and-project-framing}
 
 
-    \section{Data Sources and Data Integration}\label{sec:data-sources-and-data-integration}
+    \section{Research Goals}\label{sec:research-goals}
 
 
-    \section{Recommendation Methodology}\label{sec:recommendation-methodology}
+    \section{Methodology or Approach}\label{sec:methodology-or-approach}
 
 
-    \section{Experimental Setup}\label{sec:experimental-setup}
+    \subsection{Data Sources and Data Integration}\label{subsec:data-sources-and-data-integration}
 
 
-    \section{Results}\label{sec:results}
+    \subsection{Recommendation Methodology}\label{subsec:recommendation-methodology}
+
+
+    \section{Experimental or Evaluation Setup}\label{sec:experimental-or-evaluation-setup}
+
+
+    \section{Results and Project Outcomes}\label{sec:results-and-project-outcomes}
 
 
     \section{Discussion}\label{sec:discussion}
 
 
-    \section{Conclusion and Future Work}\label{sec:conclusion-and-future-work}
+    \section{Conclusions and Future Work}\label{sec:conclusions-and-future-work}
 
     \bibliographystyle{../ACM-Reference-Format}
     \bibliography{references}

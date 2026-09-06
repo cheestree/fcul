@@ -2,7 +2,7 @@ PDF = main.pdf
 
 all: $(PDF)
 
-%.pdf: %.tex references.bib ../acmart.cls ../ACM-Reference-Format.bst
+%.pdf: %.tex references.bib acmart.cls ../ACM-Reference-Format.bst
 	pdflatex $*
 	- bibtex $*
 	pdflatex $*
