@@ -115,6 +115,20 @@
 
     \section{Methodology and Approach}\label{sec:methodology-or-approach}
 
+    The methodology is organized as a staged pipeline.
+    First, heterogeneous authorization files are converted into a shared tabular representation.
+    Second, the normalized records are checked against microbe and pathogen reference data so that likely BCA rows can
+    be separated from non-BCA rows and from rows that require manual review.
+    Third, the resulting output classes are used as weak supervision for an authorization triage model.
+    Finally, the positive authorization rows and the model score are used to support a query prototype that ranks
+    candidate microbes and products for a crop-pathogen pair.
+
+    This structure separates three questions that are easy to conflate.
+    The pipeline asks whether a source row can be interpreted consistently.
+    The classifier asks whether a complete row resembles previously accepted or review-needed BCA authorization rows.
+    The query layer asks which known microbe-product candidates should be shown for a given crop and pathogen.
+    None of these steps, by itself, proves that a microbe is biologically effective in a new field context.
+    
     \subsection{Data Sources and Data Integration}\label{subsec:data-sources-and-data-integration}
 
     \subsection{Recommendation Methodology}\label{subsec:recommendation-methodology}
