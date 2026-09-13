@@ -77,7 +77,7 @@
     associations. These evaluations test label reproduction and association retrieval, not biological efficacy.
 
 
-    \section{Methodology}\label{sec:methodology-or-approach}
+    \section{Method}\label{sec:methodology-or-approach}
 
     The pipeline parses authorisation files into a shared table. It checks the normalised records against microbe and
     pathogen reference data, then separates BCA rows from other rows and from cases that need manual review. These
@@ -92,6 +92,73 @@
     \end{itemize}
     None of these steps proves biological effectiveness in a new field context. That requires direct testing. The
     system uses crop-pathogen relationships to identify microbes for further examination.
+
+    \subsection{Pipeline Implementation}
+
+    To answer this question, we implemented a file-based pipeline that separates source-specific parsing from shared
+    processing. This keeps differences in workbook layout inside the parser for that source and gives the later stages
+    one data contract. The repository stores raw inputs under \texttt{dataset/}, generated files under
+    \texttt{processed/}, and Python modules under \texttt{src/}. Each run produces explicit intermediate and
+    classified CSV files that researchers can inspect, compare, or pass to another program.
+
+    The dataset registry in \texttt{src/registry/registry.py} connects each dataset name to a parser and a column
+    mapping. The current entries are EU, Spain, France, and Portugal. The command line runner reads this registry,
+    selects the requested datasets, and sends each one through the same processing function. Adding a source therefore
+    requires a parser and a mapping, followed by tests for its headers and output values. Shared classification and
+    output code then handles every source in the same way. The older \texttt{main.py} and
+    \texttt{pipeline\_runner.py} entry points remain as compatibility wrappers for existing scripts and notebooks.
+
+    Each parser first identifies the source table and returns a data frame with the source headers intact. The shared
+    normalisation stage checks the required columns before processing a file. If a workbook lacks a required column,
+    the runner skips it and reports the missing names rather than creating partially labelled rows. The mapping then
+    selects the available source fields and renames them to canonical names such as \texttt{crop\_scientific\_name},
+    \texttt{pathogen\_scientific\_name}, \texttt{product\_name}, and \texttt{microbes}. Optional columns remain
+    optional. This distinction matters because the European exports do not expose the same concepts, and an empty
+    optional field should not be mistaken for a failed parse.
+
+    The source parsers also handle transformations that cannot be expressed as simple renaming. Portuguese rows can
+    contain several crop and target names in one cell. The parser expands safely paired common and scientific names into
+    separate rows. When the two lists have different lengths or cannot be paired, it sends the row to manual review with
+    \texttt{target\_pair\_mismatch}. French usage identifiers use a different convention: the parser splits the
+    \texttt{identifiant usage} value on \texttt{*} into crop, application method, and an optional target. Spanish
+    product, crop, and substance files remain separate because the available product export has no registration key
+    that can support a product-to-use join. These rules preserve source information while preventing the pipeline from
+    inventing relationships.
+
+    Normalisation also removes formatting noise that would otherwise create false differences. Text cleaning removes
+    boundary quotes, control characters, non-breaking spaces, and repeated whitespace while retaining meaningful
+    qualifiers. For example, a qualifier that limits a use to leaves remains in the output. Dates keep their date part
+    when an export includes a timestamp. The pipeline then adds reference and review fields instead of silently
+    dropping unresolved values. Missing values remain missing; a failed reference lookup becomes an explicit review
+    reason. This makes it possible to distinguish a checked value that was not found from a value that the source did
+    not provide.
+
+    The output writer defines the boundary between processing and modelling. Every dataset receives intermediate files,
+    final BCA rows, review rows, discarded rows, and a JSON run summary. The summary records row counts, output columns,
+    and review-reason counts. A second step combines only columns shared across datasets and adds a \texttt{dataset}
+    field. It filters the combined files to rows with both scientific crop and pathogen names. Country-specific files
+    remain available for audit and future integration, while incomplete rows cannot enter the shared modelling table.
+    This design prevents a large product catalogue from being mistaken for a set of verified crop-pathogen uses.
+
+    The pipeline can run interactively or from a non-interactive command. The latter accepts dataset selection and
+    options for stable sorting and reduced review outputs. The runner also reuses a cached normalised file when it is
+    available, which avoids reparsing unchanged workbooks during analysis. A rebuild can still replace that file when
+    the source data or parser changes. The ranking and query commands read the generated CSV contract rather than
+    reaching back into source-specific parsers, so model experiments use the same data boundary as the review workflow.
+
+    The test suite checks the shared stages and the source-specific edge cases. Tests cover date cleaning, canonical
+    column names, reference matching, BCA classification, target expansion, output folder creation, combined-file
+    filtering, candidate ranking, query matching, and evaluation metrics. These tests do not prove that the source
+    data are complete. They check that a known input produces the intended transformation and that the output classes
+    preserve their stated meaning. The code therefore supports repeatable data processing and inspection, while the
+    paper's ranking results remain limited by the coverage and labels of the current exports.
+
+    Source provenance remains attached during these transformations. The \texttt{source\_file} value identifies the
+    originating export, and the grouped outputs preserve the dataset and output class for each row. Expanded
+    Portuguese rows retain the fields needed to inspect the original crop and target values. This allows a reviewer to
+    move from a ranked candidate to its supporting product rows and then back to the source file. If a parser or
+    reference list changes, the intermediate CSVs and run summary also show which stage changed the row count. The
+    project can therefore be rerun and audited without relying on an undocumented manual spreadsheet step.
 
     \subsection{Data Sources and Data Integration}\label{subsec:data-sources-and-data-integration}
 
@@ -173,6 +240,9 @@
     The query matches case-insensitive literal text in the scientific crop and common or scientific pathogen fields.
     It separates known matches from inferred candidates. Inferred candidates come from related authorisation evidence;
     they do not establish a new authorisation or a biological efficacy claim.
+
+
+    \clearpage
 
 
     \section{Evaluation Setup}\label{sec:experimental-or-evaluation-setup}
