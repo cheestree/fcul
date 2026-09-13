@@ -66,7 +66,7 @@
 
     \section{Contributions}\label{sec:research-goals}
 
-    This paper makes one contribution: an authorisation-derived ranking method for BCA candidates in crop--pathogen
+    This paper makes \textbf{one contribution}: an authorisation-derived ranking method for BCA candidates in crop--pathogen
     queries when the available data contain no biological efficacy labels. The method represents crop--pathogen
     contexts and BCA values, then keeps product names as evidence that users can inspect.
 
@@ -86,16 +86,16 @@
 
     The system separates three questions:
     \begin{itemize}
-        \item pipeline: whether it can interpret a source row consistently;
-        \item classifier: whether a complete row resembles accepted BCA authorisation rows or rows requiring review; and
-        \item query: which known microbe and product candidates should be shown for a given crop and pathogen.
+        \item \textbf{pipeline:} whether it can interpret a source row consistently;
+        \item \textbf{classifier:} whether a complete row resembles accepted BCA authorisation rows or rows requiring review; and
+        \item \textbf{query:} which known microbe and product candidates should be shown for a given crop and pathogen.
     \end{itemize}
     None of these steps proves biological effectiveness in a new field context. That requires direct testing. The
     system uses crop-pathogen relationships to identify microbes for further examination.
 
-    \subsection{Pipeline Implementation}
+    \subsection{Pipeline Implementation}\label{subsec:pipeline-implementation}
 
-    To answer this question, we implemented a file-based pipeline that separates source-specific parsing from shared
+    To answer this question, we implemented a file-based \textbf{pipeline} that separates source-specific parsing from shared
     processing. This keeps differences in workbook layout inside the parser for that source and gives the later stages
     one data contract. The repository stores raw inputs under \texttt{dataset/}, generated files under
     \texttt{processed/}, and Python modules under \texttt{src/}. Each run produces explicit intermediate and
@@ -111,9 +111,9 @@
     Each parser first identifies the source table and returns a data frame with the source headers intact. The shared
     normalisation stage checks the required columns before processing a file. If a workbook lacks a required column,
     the runner skips it and reports the missing names rather than creating partially labelled rows. The mapping then
-    selects the available source fields and renames them to canonical names such as \texttt{crop\_scientific\_name},
-    \texttt{pathogen\_scientific\_name}, \texttt{product\_name}, and \texttt{microbes}. Optional columns remain
-    optional. This distinction matters because the European exports do not expose the same concepts, and an empty
+    selects the available source fields and renames them to canonical crop, pathogen, product, and microbe fields.
+    Optional columns remain optional. This distinction matters because the European exports do not expose the same
+    concepts, and an empty
     optional field should not be mistaken for a failed parse.
 
     The source parsers also handle transformations that cannot be expressed as simple renaming. Portuguese rows can
@@ -167,7 +167,7 @@
     (\texttt{eu.xlsx})~\cite{ec-pesticides-database,eu-dataset-snapshot} provides microbial substances, authorisation
     status, approval dates, authorised countries, and functions, but no crop-pathogen authorisation relation. The
     Spanish inputs are product, crop, and substance workbooks~\cite{mapa-regfiweb,spain-dataset-snapshot}; the
-    product workbook is a product catalogue, while the crop and substance workbooks remain reference catalogues
+    product workbook is a \textbf{product catalogue}, while the crop and substance workbooks remain reference catalogues
     because no registration key links them safely to product uses. The French input is the E-Phy usage CSV
     ~\cite{anses-ephy,france-dataset-snapshot}. It provides authorised product-use rows and common crop and target
     labels, but not the scientific crop-pathogen pair required by the joined modelling data. The Portuguese input
@@ -193,11 +193,6 @@
     list several target names and scientific names. The parser expands safely paired names into crop, pathogen, and
     product records and sends ambiguous pairs to manual review.
 
-    A future version could use a large language model to map fields, interpret descriptions, and suggest entity
-    matches. The system would need to tie each suggestion to its source record, validate it with deterministic rules,
-    and send uncertain cases to human review. It must not invent an authorisation or treat an inferred match as proof
-    of legal use.
-
     After normalisation, the pipeline adds reference and review fields. It matches microbe and pathogen names against
     curated reference lists after normalising accents, punctuation, and strain wording. EPPO names and codes provide
     an external reference for plant and pest terminology~\cite{eppo-global-database}.
@@ -221,7 +216,7 @@
     unresolved queue. We normalise microbial mixture strings into a canonical order and remove duplicate components.
     Each row represents one crop-pathogen context and one canonical BCA value. We collapse repeated source rows into
     an \texttt{interaction\_count} and aggregate dataset, output class, product name, and product function. Support
-    uses distinct products when available and interaction counts otherwise. Products remain evidence, not ranked items.
+    uses distinct products when available and interaction counts otherwise. Products remain \textit{evidence}, not ranked items.
 
     We treat each crop-pathogen context as an implicit user and each BCA as an item. The interaction table becomes a
     context-item matrix. We retain interaction counts for support features but use binary presence for similarity.
@@ -366,8 +361,12 @@
     associations, not biological efficacy.
 
     Future work should add structured sources, show associated crop and pathogen pairs as evidence, improve BCA mixture
-    normalisation, and use a separate validation split to tune ranking weights. Cold-start and temporal evaluations
-    are also needed before assessing the system beyond this authorisation-based prototype.
+    normalisation, and use a separate validation split to tune ranking weights. It should also test a bounded large
+    language model (LLM) stage for irregular datasets. The LLM could suggest column mappings, translate source labels,
+    and propose candidate entity matches so that more BCA records can enter the pipeline. Deterministic validation
+    and human review must check these suggestions before they reach the modelling table; inferred mappings cannot
+    count as verified authorisation evidence. Cold-start and temporal evaluations are also needed before assessing the
+    system beyond this authorisation-based prototype.
 
     \bibliographystyle{../ACM-Reference-Format}
     \bibliography{references}
