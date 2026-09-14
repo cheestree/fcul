@@ -51,10 +51,9 @@
 
     Pests and plant diseases cause substantial crop losses, so crop protection is important for agricultural
     production. Biological control agents, including beneficial microorganisms and their products, can contribute to
-    integrated pest management as alternatives or complements to synthetic pesticides~\cite{glare-biopesticides,
-    van-lenteren-biological-control}. Their practical use depends on the crop, target organism, microbial strain,
+    integrated pest management as alternatives or complements to synthetic pesticides. Their practical use depends on the crop, target organism, microbial strain,
     formulation, application conditions, and regulatory context. Microbial agents can act through several mechanisms,
-    including plant defence induction, competition, hyperparasitism, and antibiosis~\cite{kohl-mode-action}. These
+    including plant defence induction, competition, hyperparasitism, and antibiosis. These
     mechanisms and their dependence on the local environment make evidence from an authorisation record different
     from evidence of efficacy in a new field setting.
 
@@ -77,16 +76,19 @@
     We therefore frame BCA identification as a ranking task. The system links crops, pathogens, products, and active
     substances, then ranks candidate BCAs for a query.
 
-    The research question is whether these records can retrieve known BCA associations and rank related candidates for
-    a crop--pathogen query. This paper addresses data integration and retrieval. It does not compare efficacy models
-    because the current sources contain no independent biological efficacy labels.
+    The research question is: how well can an authorisation-derived ranker retrieve a held-out microbial BCA for a
+    crop--pathogen query in the current Portuguese catalogue, and does adding a small BCA co-occurrence signal improve
+    retrieval over direct support alone? This question concerns recovery of observed authorisation associations. It does
+    not assess biological efficacy, safety, or legal authorisation for a new use because the sources contain no
+    independent biological labels.
 
 
     \section{Contributions}\label{sec:research-goals}
 
-    This paper makes \textbf{one contribution}: an authorisation-derived ranking method for BCA candidates in crop--pathogen
-    queries when the available data contain no biological efficacy labels. The method represents crop--pathogen
-    contexts and BCA values, then keeps product names as evidence that users can inspect.
+    This paper makes \textbf{one contribution}: an evaluation of a transparent authorisation-derived ranker. It tests
+    whether the ranker recovers held-out BCA associations for crop--pathogen queries in warm-start contexts. The
+    integration and triage stages support this evaluation by preserving traceable evidence and separating unresolved
+    rows from accepted authorisation records. Product names remain evidence users can inspect, not ranked items.
 
     We pursued three objectives. First, we integrated heterogeneous authorisation sources into a shared schema while
     preserving unresolved cases for review. Second, we separated authorisation-derived BCA evidence from other rows
@@ -155,8 +157,7 @@
 
     Source identifiers and output classes remain attached to each row, and expanded Portuguese rows retain the fields
     needed to inspect their original crop and target values. These records support audit and show how parser or
-    reference-list changes affect row counts. Processing rules are documented in the accompanying software
-    artifact~\cite{project-repository}.
+    reference-list changes affect row counts.
 
     \subsection{Data Sources and Data Integration}\label{subsec:data-sources-and-data-integration}
 
@@ -274,10 +275,10 @@
     and pathogen names and the lexicographically last canonical BCA is selected as the held-out edge. Unavailable targets
     are counted as misses; 107 of 109 inferred-only cases remain covered (98.2\%). We report results for all candidates
     and for an inferred-only view, which removes candidates that still have a known context match and corresponds to the
-    query interface.
+    query interface. The all-candidate hybrid result is reported below for completeness.
 
     We measure ranking quality with HitRate@1, HitRate@5, HitRate@10, mean reciprocal rank (MRR), and normalised
-    discounted cumulative gain (NDCG), following standard cumulative-gain evaluation for ranked retrieval~\cite{jarvelin-cumulated-gain}.
+    discounted cumulative gain (NDCG), following standard cumulative-gain evaluation for ranked retrieval.
     We report candidate coverage separately because the ranker cannot recover a BCA
     that never appears elsewhere in the interaction catalogue in this warm start experiment. The baselines rank BCAs
     by pathogen support and total support.
@@ -331,6 +332,9 @@
         \end{tabular}
     \end{table}
 
+    In the all-candidate view, the hybrid ranker reaches 100.0\% coverage, 81.7\% Hit@5, and an MRR of 0.319. The
+    inferred-only view is the user-facing analysis shown in Table~\ref{tab:ranking-results}.
+
     The triage score is not included in the current ranking score. This keeps it available as transparent
     evidence from the authorisation data while avoiding a ranking contribution that was not supported by the held out
     retrieval results. The results should therefore be read as recovery of associations present in the source data,
@@ -369,13 +373,11 @@
     authorisation-derived associations: the system can recover held-out associations in the current Portuguese catalogue,
     but it cannot establish efficacy, approval, or suitability for new uses.
 
-    Future work should add structured sources, show associated crop and pathogen pairs as evidence, improve BCA mixture
-    normalisation, and use a separate validation split to tune ranking weights. It should also test a bounded large
-    language model (LLM) stage for irregular datasets. The LLM could suggest column mappings, translate source labels,
-    and propose candidate entity matches so that more BCA records can enter the pipeline. Deterministic validation
-    and human review must check these suggestions before they reach the modelling table; inferred mappings cannot
-    count as verified authorisation evidence. Cold-start and temporal evaluations are also needed before assessing the
-    system beyond this authorisation-based prototype.
+    Future work should first add structured sources with verified crop--pathogen pairs and evaluate the ranker with
+    independent efficacy or field data. It should then use a validation split to tune weights and test cold-start and
+    temporal settings. A bounded large language model (LLM) stage may assist irregular source mapping, but deterministic
+    validation and human review must check every suggestion before it enters the modelling table. Inferred mappings
+    cannot count as verified authorisation evidence.
 
     \bibliographystyle{../ACM-Reference-Format}
     \bibliography{references}
