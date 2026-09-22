@@ -1,41 +1,7 @@
- \section{Method}\label{sec:methodology-or-approach}
+\section{Method}\label{sec:methodology-or-approach}
 
-The pipeline parses authorisation files into a shared table. 
-It checks the normalised records against microbe and pathogen reference data, then separates BCA rows from other rows and from cases that need manual review. 
-These classes provide weak labels for an authorisation triage model. 
-The query step ranks candidate BCAs from accepted authorisation rows and keeps product records as supporting evidence.
-
-The system separates three questions:
-\begin{itemize}
-    \item \textbf{pipeline:} whether it can interpret a source row consistently;
-    \item \textbf{classifier:} whether a complete row resembles accepted BCA authorisation rows or rows requiring review; and
-    \item \textbf{query:} which known microbe and product candidates should be shown for a given crop and pathogen.
-\end{itemize}
-
-\subsection{Pipeline Implementation}\label{subsec:pipeline-implementation}
-
-To answer this question, we implemented a \textbf{pipeline} that separates source-specific parsing from shared processing. Each run produces intermediate and classified records for inspection.
-
-A registry connects each source to its parser and column mapping. The current sources are the European Union, Spain, France, and Portugal. 
-After source-specific mapping, shared classification and output stages handle every source consistently.
-
-Each parser retains original values and maps available fields to canonical crop, pathogen, product, and microbe fields. 
-Required columns are checked before processing; a missing required column causes a reported skip rather than a partially labelled row. 
-Optional columns remain optional because the exports do not expose the same concepts.
-
-The source parsers also handle transformations that cannot be expressed as simple renaming. Portuguese rows can contain several crop and target names in one cell. 
-The pipeline expands safely paired common and scientific names into separate rows. 
-When the two lists have different lengths or cannot be paired, it sends the row to manual review. French usage records encode several use attributes in one identifier, which the parser separates into crop, application method, and optional target fields.
-Spanish product, crop, and substance catalogues remain separate because the available product data do not provide a registration key that can support a product-to-use join. 
-These rules preserve source information while preventing the pipeline from creating relationships.
-
-Normalisation removes formatting noise while retaining meaningful qualifiers, and timestamps keep their date part when an export includes a timestamp. Reference and review fields make unresolved values explicit: missing source values remain missing, while a failed lookup receives a review reason.
-
-The output stage separates processing from modelling. 
-Each source receives final BCA, review, discarded, and summary records. 
-A second step combines shared columns and keeps only rows with both scientific crop and pathogen names. 
-Incomplete rows cannot enter the shared modelling table.
-This design prevents a large product catalogue from being mistaken for a set of verified crop-pathogen uses.
-
-Source identifiers and output classes remain attached to each row, and expanded Portuguese rows retain the fields needed to inspect their original crop and target values. 
-These records support audit and show how parser or reference-list changes affect row counts.
+The method has three stages.
+First, the data stage integrates heterogeneous authorisation sources into a shared schema.
+Second, the database stage identifies BCA-related records and constructs an authorisation-based commercial BCA resource with explicit evidence and review states. 
+Third, the recommender stage uses the accepted records to rank microbial BCA candidates for crop--pathogen queries. 
+The stages are evaluated separately so that data processing, database construction, and candidate retrieval are not treated as the same task.
