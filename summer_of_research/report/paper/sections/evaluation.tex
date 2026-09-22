@@ -1,0 +1,51 @@
+\section{Evaluation Setup}\label{sec:experimental-or-evaluation-setup}
+    
+\begin{strip}
+    \centering
+    \captionof{table}{Experimental setup and outputs.}
+    \label{tab:experimental-setup}
+    \scriptsize
+    \setlength{\tabcolsep}{3pt}
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{p{0.12\textwidth} p{0.20\textwidth} p{0.40\textwidth} p{0.20\textwidth}}
+        \hline
+        \textbf{Stage} & \textbf{Input}                                                                     & \textbf{Processing or model}                                                                                                          & \textbf{Output}                                                                                                 \\
+        \hline
+        Pipeline       & Four authorisation exports.                                                        & Source-specific parsing, canonical normalisation, reference matching, and separation into final, review, and discarded rows. & 1,530 final rows, 10,160 review rows, and 183,507 discarded rows in the joined modelling data. \\
+        Classifier     & 195,197 joined rows: 11,690 positive final/review rows and 183,507 discarded rows. & TF-IDF text features with balanced logistic regression. An 80/20 grouped holdout is split by dataset, microbe, pathogen, and product. & Accuracy, macro F1, ROC AUC, and average precision of $1.000$. \\
+        Ranking        & 1,530 accepted Portuguese final rows.                                              & 595 context-BCA interactions. One edge is held out from each of 109 complete contexts containing at least two BCAs. & Hybrid direct-support and collaborative ranking, with inferred-only results in Table~\ref{tab:ranking-results}. \\
+        \hline
+    \end{tabular}
+\end{strip}
+
+We evaluate the pipeline, classifier, and ranker separately. Pipeline checks confirm that the parsers produce the
+expected schema, required columns exist, target expansion produces auditable rows, and each data set produces the
+expected \textit{final}, \textit{review}, and \textit{discarded} files.
+
+The classifier uses the generated classes as weak labels. Rows in \textit{final} and \textit{review} receive the
+positive label because they contain BCA evidence or need BCA related review. The rows in \textit{discarded} receive the
+negative label because the pipeline did not find a BCA signal. Only rows with complete scientific crop and pathogen
+pairs enter training. The classifier uses scientific crop and pathogen names, microbe, product, product function,
+and source context; it excludes common crop and pathogen names because their language varies. The TF-IDF
+vectorizer uses unigrams and bigrams, ignores terms seen in only one row, and keeps at most 60,000 features.
+Balanced logistic regression uses the liblinear solver with 1,000 iterations. Reference-match flags,
+extracted genera, review and discard reasons, and purpose text are excluded to reduce direct leakage from the
+pipeline decisions. An 80/20 grouped holdout keeps related dataset, microbe, pathogen, and product rows on the
+same side of the split. The resulting metrics measure reproduction of labels derived from authorisation data.
+
+For ranking, we select complete crop-pathogen contexts with at least two distinct observed BCAs and hold out one
+deterministic context-BCA edge from each context. We remove the edge before building features, then rank the held
+out BCA among the remaining candidate catalogue. For reproducibility, contexts are ordered by their scientific crop
+and pathogen names and the lexicographically last canonical BCA is selected as the held-out edge. Unavailable targets
+are counted as misses; 107 of 109 inferred-only cases remain covered (98.2\%). We report results for all candidates
+and for an inferred-only view, which removes candidates that still have a known context match and corresponds to the
+query interface. The all-candidate hybrid result is reported below for completeness.
+
+We measure ranking quality with HitRate@1, HitRate@5, HitRate@10, mean reciprocal rank (MRR), and normalised
+discounted cumulative gain (NDCG), following standard cumulative-gain evaluation for ranked retrieval.
+We report candidate coverage separately because the ranker cannot recover a BCA
+that never appears elsewhere in the interaction catalogue in this warm start experiment. The baselines rank BCAs
+by pathogen support and total support.
+
+This protocol tests retrieval of observed authorisation associations. It does not establish biological efficacy,
+safety, suitability for an untreated crop and pathogen pair, or legal authorisation for a new use.

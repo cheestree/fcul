@@ -1,0 +1,52 @@
+\section{Results}\label{sec:results-and-project-outcomes}
+
+The classifier reproduced the weak labels perfectly: accuracy, macro F1, ROC AUC, and average precision are all
+$1.000$. These values show that it reproduced the pipeline output classes in this split; they do not measure
+biological efficacy.
+
+Table~\ref{tab:ranking-results} reports the inferred-only results. It separates candidate recovery, measured by
+coverage and HitRate@k, from rank quality, measured by MRR and NDCG@10. Coverage is the fraction of queries in
+which the held-out BCA remains in the candidate catalogue. HitRate@k is the fraction of queries that recover it in
+the first $k$ positions. MRR rewards higher ranks, and NDCG@10 gives less weight to lower-ranked hits.
+
+\begin{table}[H]
+    \caption{Ranking results for the inferred only view ($n=109$ contexts). Higher is better for every metric.}
+    \label{tab:ranking-results}
+    \centering
+    \small
+    \setlength{\tabcolsep}{3pt}
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{lrrrr}
+        \hline
+        \multicolumn{5}{l}{\textit{Candidate recovery}} \\
+        \textbf{Variant}  & \textbf{Coverage} & \textbf{Hit@1} & \textbf{Hit@5} & \textbf{Hit@10} \\
+        \hline
+        Hybrid            & 98.2\%            & 60.6\%         & 93.6\%         & 98.2\%          \\
+        Direct support    & 98.2\%            & 60.6\%         & 92.7\%         & 98.2\%          \\
+        Collaborative     & 98.2\%            & 45.9\%         & 86.2\%         & 93.6\%          \\
+        Pathogen baseline & 98.2\%            & 60.6\%         & 92.7\%         & 98.2\%          \\
+        Total baseline    & 98.2\%            & 4.6\%          & 47.7\%         & 82.6\%          \\
+        \hline
+    \end{tabular}
+    \vspace{3pt}
+    \begin{tabular}{lrr}
+        \hline
+        \multicolumn{3}{l}{\textit{Rank quality}} \\
+        \textbf{Variant}  & \textbf{MRR} & \textbf{NDCG@10} \\
+        \hline
+        Hybrid            & 0.749        & 0.807            \\
+        Direct support    & 0.743        & 0.802            \\
+        Collaborative     & 0.645        & 0.715            \\
+        Pathogen baseline & 0.743        & 0.802            \\
+        Total baseline    & 0.249        & 0.373            \\
+        \hline
+    \end{tabular}
+\end{table}
+
+In the all-candidate view, the hybrid ranker reaches 100.0\% coverage, 81.7\% Hit@5, and an MRR of 0.319. The
+inferred-only view is the user-facing analysis shown in Table~\ref{tab:ranking-results}.
+
+The triage score is not included in the current ranking score. This keeps it available as transparent
+evidence from the authorisation data while avoiding a ranking contribution that was not supported by the held out
+retrieval results. The results should therefore be read as recovery of associations present in the source data,
+not as evidence that one BCA is biologically superior to another.

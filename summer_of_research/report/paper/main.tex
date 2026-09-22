@@ -1,4 +1,5 @@
-\documentclass[sigconf]{acmart}
+%\documentclass[sigconf]{acmart}
+\documentclass[sigconf,nonacm]{acmart}
 
 \usepackage{cuted}
 
@@ -6,19 +7,21 @@
     \providecommand\BibTeX{{%
         Bib\TeX}}}
 
-\setcopyright{none}
-\settopmatter{printacmref=false}
-\renewcommand\footnotetextcopyrightpermission[1]{}
+%\setcopyright{none}
+%\settopmatter{printacmref=true}
+%\renewcommand\footnotetextcopyrightpermission[1]{}
 
 \begin{document}
+    \ccsdesc[500]{Computing methodologies~Machine learning}
+    \ccsdesc[300]{Information systems~Data mining}
 
     \title{A Recommender System for Biological Control Agents in Agriculture}
 
     \author{Daniel Carvalho}
-    \email{daniel.mq.carvalho@gmail.com}
+    \email{fc66208@alunos.ciencias.ulisboa.pt}
     \author{Márcia Barros}
     \authornote{Project mentor}
-    \email{marcia.c.a.barros@gmail.com}
+    \email{mcbarros@ciencias.ulisboa.pt}
     \affiliation{%
         \institution{FCUL}
         \city{Lisbon}
@@ -46,340 +49,27 @@
 
     \maketitle
 
+    \input{sections/background}
 
-    \section{Background}\label{sec:background-and-context}
+    \input{sections/problem}
 
-    Pests and plant diseases cause substantial crop losses, so crop protection is important for agricultural
-    production. Biological control agents, including beneficial microorganisms and their products, can contribute to
-    integrated pest management as alternatives or complements to synthetic pesticides. Their practical use depends on the crop, target organism, microbial strain,
-    formulation, application conditions, and regulatory context. Microbial agents can act through several mechanisms,
-    including plant defence induction, competition, hyperparasitism, and antibiosis. These
-    mechanisms and their dependence on the local environment make evidence from an authorisation record different
-    from evidence of efficacy in a new field setting.
+    \input{sections/contribution}
 
-    \subsection{Related Work}
+    \input{sections/method}
 
-    Previous work describes the opportunities and adoption barriers for microbial and other biological control
-    agents, including variable field performance, formulation constraints, and the need to integrate them into
-    broader pest-management systems~\cite{glare-biopesticides,van-lenteren-biological-control}. Research on
-    microbial modes of action also shows that disease suppression can result from interacting mechanisms rather than
-    one universal agent--pathogen effect~\cite{kohl-mode-action}. These findings motivate a system that makes
-    existing authorisation associations easier to retrieve and inspect while avoiding claims about biological
-    performance. The present work therefore focuses on data integration and ranking of traceable candidates.
+    \input{sections/data}
 
+    \input{sections/ranking}
 
-    \section{Problem and Research Question}\label{sec:motivation-and-project-framing}
+    \input{sections/evaluation}
 
-    Regulatory sources contain information about BCAs and their authorised uses, but finding an option for a given
-    crop and pathogen pair remains difficult. The sources use different structures, terms, and levels of detail.
-    They also present regulatory or production records rather than answers to a specific crop protection question.
-    We therefore frame BCA identification as a ranking task. The system links crops, pathogens, products, and active
-    substances, then ranks candidate BCAs for a query.
+    \input{sections/results}
 
-    The research question is: how well can an authorisation-derived ranker retrieve a held-out microbial BCA for a
-    crop--pathogen query in the current Portuguese catalogue, and does adding a small BCA co-occurrence signal improve
-    retrieval over direct support alone? This question concerns recovery of observed authorisation associations. It does
-    not assess biological efficacy, safety, or legal authorisation for a new use because the sources contain no
-    independent biological labels.
+    \input{sections/discussion}
 
+    \input{sections/conclusions}
 
-    \section{Contributions}\label{sec:research-goals}
-
-    This paper makes \textbf{one contribution}: an evaluation of a transparent authorisation-derived ranker. It tests
-    whether the ranker recovers held-out BCA associations for crop--pathogen queries in warm-start contexts. The
-    integration and triage stages support this evaluation by preserving traceable evidence and separating unresolved
-    rows from accepted authorisation records. Product names remain evidence users can inspect, not ranked items.
-
-    We pursued three objectives. First, we integrated heterogeneous authorisation sources into a shared schema while
-    preserving unresolved cases for review. Second, we separated authorisation-derived BCA evidence from other rows
-    to construct transparent weak labels. Third, we tested whether a hybrid ranker could retrieve held-out BCA
-    associations at least as well as direct-support and simple support baselines in warm-start contexts. The
-    evaluation hypothesis was that combining direct support with a small co-occurrence signal would match or improve
-    retrieval of observed associations.
-
-    The pipeline maps four authorisation sources to a common schema and separates accepted, review, and discarded
-    rows. A weakly supervised classifier reproduces these row classes and provides a diagnostic triage score. The
-    BCA-level ranker uses accepted Portuguese rows to retrieve known matches and infer candidates from related
-    authorisation evidence. We evaluate the classifier on a grouped holdout and the ranker on held-out authorisation
-    associations. In the inferred-only view, the hybrid ranker reaches 93.6\% Hit@5 and an MRR of 0.749 over 109
-    contexts. These evaluations test label reproduction and association retrieval, not biological efficacy.
-
-
-    \section{Method}\label{sec:methodology-or-approach}
-
-    The pipeline parses authorisation files into a shared table. It checks the normalised records against microbe and
-    pathogen reference data, then separates BCA rows from other rows and from cases that need manual review. These
-    classes provide weak labels for an authorisation triage model. The query step ranks candidate BCAs from accepted
-    authorisation rows and keeps product records as supporting evidence.
-
-    The system separates three questions:
-    \begin{itemize}
-        \item \textbf{pipeline:} whether it can interpret a source row consistently;
-        \item \textbf{classifier:} whether a complete row resembles accepted BCA authorisation rows or rows requiring review; and
-        \item \textbf{query:} which known microbe and product candidates should be shown for a given crop and pathogen.
-    \end{itemize}
-    None of these steps proves biological effectiveness in a new field context. That requires direct testing. The
-    system uses crop-pathogen relationships to identify microbes for further examination.
-
-    \subsection{Pipeline Implementation}\label{subsec:pipeline-implementation}
-
-    To answer this question, we implemented a \textbf{pipeline} that separates source-specific parsing from shared
-    processing. Each run produces intermediate and classified records for inspection.
-
-    A registry connects each source to its parser and column mapping. The current sources are the European Union,
-    Spain, France, and Portugal. After source-specific mapping, shared classification and output stages handle every
-    source consistently.
-
-    Each parser retains original values and maps available fields to canonical crop, pathogen, product, and microbe
-    fields. Required columns are checked before processing; a missing required column causes a reported skip rather than
-    a partially labelled row. Optional columns remain optional because the exports do not expose the same concepts.
-
-    The source parsers also handle transformations that cannot be expressed as simple renaming. Portuguese rows can
-    contain several crop and target names in one cell. The pipeline expands safely paired common and scientific names
-    into separate rows. When the two lists have different lengths or cannot be paired, it sends the row to manual
-    review. French usage records encode several use attributes in one identifier, which the parser separates into crop,
-    application method, and optional target fields. Spanish product, crop, and substance catalogues remain separate
-    because the available product data do not provide a registration key that can support a product-to-use join. These
-    rules preserve source information while preventing the pipeline from inventing relationships.
-
-    Normalisation removes formatting noise while retaining meaningful qualifiers, and dates keep their date part when
-    an export includes a timestamp. Reference and review fields make unresolved values explicit: missing source values
-    remain missing, while a failed lookup receives a review reason.
-
-    The output stage separates processing from modelling. Each source receives final BCA, review, discarded, and summary
-    records. A second step combines shared columns and keeps only rows with both scientific crop and pathogen names.
-    Incomplete rows cannot enter the shared modelling table.
-    This design prevents a large product catalogue from being mistaken for a set of verified crop-pathogen uses.
-
-    The ranking and query stages read this data contract rather than source-specific parsers. Tests cover normalisation,
-    reference matching, BCA classification, target expansion, combined-data filtering, ranking, query matching, and
-    evaluation metrics. They verify intended transformations and output meanings, but do not prove source completeness.
-
-    Source identifiers and output classes remain attached to each row, and expanded Portuguese rows retain the fields
-    needed to inspect their original crop and target values. These records support audit and show how parser or
-    reference-list changes affect row counts.
-
-    \subsection{Data Sources and Data Integration}\label{subsec:data-sources-and-data-integration}
-
-    We use four authorisation exports from the European Union, Spain, France, and Portugal. The sources differ in
-    language, level of detail, and table structure, so each parser maps its columns to a shared schema. The EU input
-    ~\cite{ec-pesticides-database,eu-dataset-snapshot} provides microbial substances, authorisation
-    status, approval dates, authorised countries, and functions, but no crop-pathogen authorisation relation. The
-    Spanish inputs are product, crop, and substance workbooks~\cite{mapa-regfiweb,spain-dataset-snapshot}; the
-    product workbook is a \textbf{product catalogue}, while the crop and substance workbooks remain reference catalogues
-    because no registration key links them safely to product uses. The French input is the E-Phy usage export
-    ~\cite{anses-ephy,france-dataset-snapshot}. It provides authorised product-use rows and common crop and target
-    labels, but not the scientific crop-pathogen pair required by the joined modelling data. The Portuguese input
-    consists of several official exports~\cite{dgav-sifito}. These sources provide the most complete crop, pathogen,
-    product, authorisation, and microbial substance fields and supply all rows in the current joined modelling data.
-    Common fields include crop names, scientific crop names where available, target organisms, scientific pathogen
-    names, product names, product functions, authorisation dates, and microbial active substances.
-
-    The Spanish product table does not link products to crops or pests, and the French use export lacks the scientific
-    pair fields required by the joined modelling data. The other country records remain available for catalogue
-    inspection and audit. Only Portuguese records currently enter the joined modelling data: 1,530 final rows, 10,160
-    review rows, and 183,507 discarded rows. The other sources remain outside the ranking catalogue until their missing
-    links can be validated.
-
-    Before merging records, the pipeline checks each source for its required columns and skips files that fail the
-    check. It keeps optional fields when available. The Portuguese source needs an expansion step because one row can
-    list several target names and scientific names. The parser expands safely paired names into crop, pathogen, and
-    product records and sends ambiguous pairs to manual review.
-
-    After normalisation, the pipeline adds reference and review fields. It matches microbe and pathogen names against
-    curated reference lists after normalising accents, punctuation, and strain wording. EPPO names and codes provide
-    an external reference for plant and pest terminology~\cite{eppo-global-database}.
-    The pipeline marks a row as BCA related when its microbe value matches the microbe reference data or contains an
-    explicit biological indicator such as a strain, virus, bacteriophage, or microorganism. Rows with BCA signal and
-    no review reason enter \textit{final}; rows with BCA signal and an unresolved reference or target pair enter
-    \textit{review}; all remaining rows enter \textit{discarded}.
-    These groups are evidence classes produced by the pipeline, not biological efficacy labels; discarded rows are
-    retained for audit and used as negative examples for the classifier.
-
-    \subsection{Ranking Method}\label{subsec:recommendation-methodology}
-
-    We rank the canonical microbial active-substance value. It represents a BCA or a listed BCA mixture. We keep
-    products as evidence so users can inspect the authorisation records behind each candidate.
-
-    We build the current ranking catalogue from Portuguese authorisation records only. Portugal is the only
-    source that provides complete records for the required fields. We keep the other country outputs separate until we
-    recover and validate their missing links.
-
-    We derive the interaction table from accepted \textit{final} rows; \textit{review} rows remain a separate
-    unresolved queue. We normalise microbial mixture strings into a canonical order and remove duplicate components.
-    Each row represents one crop-pathogen context and one canonical BCA value. We collapse repeated source rows into
-    an interaction count and aggregate source, output class, product name, and product function. Support
-    uses distinct products when available and interaction counts otherwise. Products remain \textit{evidence}, not ranked items.
-
-    We treat each crop-pathogen context as an implicit user and each BCA as an item. The interaction table becomes a
-    context-item matrix. We retain interaction counts for support features but use binary presence for similarity.
-    The collaborative component computes cosine similarity between BCA vectors, prefers contexts with the same
-    pathogen, and falls back to global contexts when necessary. It shrinks similarities when item overlap is small
-    and scores each candidate from its two strongest similarities to the observed query BCAs. If the query has no
-    observed items, the collaborative score is zero and direct support provides the fallback.
-
-    The ranker combines context, pathogen, and collaborative support. It also computes crop, total, and dataset
-    support, but assigns them zero weight. It normalises count features within the candidate set before weighting them.
-    The current weights are $0.475$ for known context
-    matches, $0.190$ for context support, $0.285$ for pathogen support, and $0.050$ for collaborative similarity;
-    crop, total, and dataset support have weight zero. The query also reports the triage score as a diagnostic, but
-    does not use it for ordering in the current evaluation. Its weight is zero and the value remains available for
-    audit and manual review.
-
-    The query matches case-insensitive literal text in the scientific crop and common or scientific pathogen fields.
-    It separates known matches from inferred candidates. Inferred candidates come from related authorisation evidence;
-    they do not establish a new authorisation or a biological efficacy claim.
-
-
-    \clearpage
-
-
-    \section{Evaluation Setup}\label{sec:experimental-or-evaluation-setup}
-
-    \begin{strip}
-        \centering
-        \captionof{table}{Experimental setup and outputs.}
-        \label{tab:experimental-setup}
-        \scriptsize
-        \setlength{\tabcolsep}{3pt}
-        \renewcommand{\arraystretch}{1.15}
-        \begin{tabular}{p{0.12\textwidth} p{0.20\textwidth} p{0.40\textwidth} p{0.20\textwidth}}
-            \hline
-            \textbf{Stage} & \textbf{Input}                                                                     & \textbf{Processing or model}                                                                                                          & \textbf{Output}                                                                                                 \\
-            \hline
-            Pipeline       & Four authorisation exports.                                                        & Source-specific parsing, canonical normalisation, reference matching, and separation into final, review, and discarded rows. & 1,530 final rows, 10,160 review rows, and 183,507 discarded rows in the joined modelling data. \\
-            Classifier     & 195,197 joined rows: 11,690 positive final/review rows and 183,507 discarded rows. & TF-IDF text features with balanced logistic regression. An 80/20 grouped holdout is split by dataset, microbe, pathogen, and product. & Accuracy, macro F1, ROC AUC, and average precision of $1.000$. \\
-            Ranking        & 1,530 accepted Portuguese final rows.                                              & 595 context-BCA interactions. One edge is held out from each of 109 complete contexts containing at least two BCAs. & Hybrid direct-support and collaborative ranking, with inferred-only results in Table~\ref{tab:ranking-results}. \\
-            \hline
-        \end{tabular}
-    \end{strip}
-
-    We evaluate the pipeline, classifier, and ranker separately. Pipeline checks confirm that the parsers produce the
-    expected schema, required columns exist, target expansion produces auditable rows, and each data set produces the
-    expected \textit{final}, \textit{review}, and \textit{discarded} files.
-
-    The classifier uses the generated classes as weak labels. Rows in \textit{final} and \textit{review} receive the
-    positive label because they contain BCA evidence or need BCA related review. Rows in \textit{discarded} receive the
-    negative label because the pipeline found no BCA signal. Only rows with complete scientific crop and pathogen
-    pairs enter training. The classifier uses scientific crop and pathogen names, microbe, product, product function,
-    and source context; it excludes common crop and pathogen names because their language varies. The TF-IDF
-    vectorizer uses unigrams and bigrams, ignores terms seen in only one row, and keeps at most 60,000 features.
-    Balanced logistic regression uses the liblinear solver with 1,000 iterations. Reference-match flags,
-    extracted genera, review and discard reasons, and purpose text are excluded to reduce direct leakage from the
-    pipeline decisions. An 80/20 grouped holdout keeps related dataset, microbe, pathogen, and product rows on the
-    same side of the split. The resulting metrics measure reproduction of labels derived from authorisation data.
-
-    For ranking, we select complete crop-pathogen contexts with at least two distinct observed BCAs and hold out one
-    deterministic context-BCA edge from each context. We remove the edge before building features, then rank the held
-    out BCA among the remaining candidate catalogue. For reproducibility, contexts are ordered by their scientific crop
-    and pathogen names and the lexicographically last canonical BCA is selected as the held-out edge. Unavailable targets
-    are counted as misses; 107 of 109 inferred-only cases remain covered (98.2\%). We report results for all candidates
-    and for an inferred-only view, which removes candidates that still have a known context match and corresponds to the
-    query interface. The all-candidate hybrid result is reported below for completeness.
-
-    We measure ranking quality with HitRate@1, HitRate@5, HitRate@10, mean reciprocal rank (MRR), and normalised
-    discounted cumulative gain (NDCG), following standard cumulative-gain evaluation for ranked retrieval.
-    We report candidate coverage separately because the ranker cannot recover a BCA
-    that never appears elsewhere in the interaction catalogue in this warm start experiment. The baselines rank BCAs
-    by pathogen support and total support.
-
-    This protocol tests retrieval of observed authorisation associations. It does not establish biological efficacy,
-    safety, suitability for an untreated crop and pathogen pair, or legal authorisation for a new use.
-
-
-    \section{Results}\label{sec:results-and-project-outcomes}
-
-    The classifier reproduced the weak labels perfectly: accuracy, macro F1, ROC AUC, and average precision are all
-    $1.000$. These values show that it reproduced the pipeline output classes in this split; they do not measure
-    biological efficacy.
-
-    Table~\ref{tab:ranking-results} reports the inferred-only results. It separates candidate recovery, measured by
-    coverage and HitRate@k, from rank quality, measured by MRR and NDCG@10. Coverage is the fraction of queries in
-    which the held-out BCA remains in the candidate catalogue. HitRate@k is the fraction of queries that recover it in
-    the first $k$ positions. MRR rewards higher ranks, and NDCG@10 gives less weight to lower-ranked hits.
-
-    \begin{table}[H]
-        \caption{Ranking results for the inferred only view ($n=109$ contexts). Higher is better for every metric.}
-        \label{tab:ranking-results}
-        \centering
-        \small
-        \setlength{\tabcolsep}{3pt}
-        \renewcommand{\arraystretch}{1.15}
-        \begin{tabular}{lrrrr}
-            \hline
-            \multicolumn{5}{l}{\textit{Candidate recovery}} \\
-            \textbf{Variant}  & \textbf{Coverage} & \textbf{Hit@1} & \textbf{Hit@5} & \textbf{Hit@10} \\
-            \hline
-            Hybrid            & 98.2\%            & 60.6\%         & 93.6\%         & 98.2\%          \\
-            Direct support    & 98.2\%            & 60.6\%         & 92.7\%         & 98.2\%          \\
-            Collaborative     & 98.2\%            & 45.9\%         & 86.2\%         & 93.6\%          \\
-            Pathogen baseline & 98.2\%            & 60.6\%         & 92.7\%         & 98.2\%          \\
-            Total baseline    & 98.2\%            & 4.6\%          & 47.7\%         & 82.6\%          \\
-            \hline
-        \end{tabular}
-        \vspace{3pt}
-        \begin{tabular}{lrr}
-            \hline
-            \multicolumn{3}{l}{\textit{Rank quality}} \\
-            \textbf{Variant}  & \textbf{MRR} & \textbf{NDCG@10} \\
-            \hline
-            Hybrid            & 0.749        & 0.807            \\
-            Direct support    & 0.743        & 0.802            \\
-            Collaborative     & 0.645        & 0.715            \\
-            Pathogen baseline & 0.743        & 0.802            \\
-            Total baseline    & 0.249        & 0.373            \\
-            \hline
-        \end{tabular}
-    \end{table}
-
-    In the all-candidate view, the hybrid ranker reaches 100.0\% coverage, 81.7\% Hit@5, and an MRR of 0.319. The
-    inferred-only view is the user-facing analysis shown in Table~\ref{tab:ranking-results}.
-
-    The triage score is not included in the current ranking score. This keeps it available as transparent
-    evidence from the authorisation data while avoiding a ranking contribution that was not supported by the held out
-    retrieval results. The results should therefore be read as recovery of associations present in the source data,
-    not as evidence that one BCA is biologically superior to another.
-
-
-    \section{Discussion}\label{sec:discussion}
-
-    A pathogen support signal accounts for much of the ranking behaviour in the current data. The sources repeat
-    authorisation records around target organisms, while a missing record does not provide a reliable negative label.
-    The hybrid ranker slightly improves on direct support alone in HitRate@5, MRR, and NDCG@10. Collaborative support
-    alone performs worse. The improvement over direct support is small: $+0.9$ percentage points in Hit@5, $+0.006$
-    MRR, and $+0.005$ NDCG@10. No confidence intervals or significance test are available, so these differences should be treated as
-    descriptive evidence for a possible small benefit from collaboration rather than as a firm improvement.
-
-    The classifier results also need a narrow interpretation. Grouped holdout keeps related source, microbe, pathogen,
-    and product rows on the same side of the split, and rule-derived match and review fields are excluded. However, the
-    labels are generated from the same authorisation records and related fields that supply the model features. The
-    perfect scores therefore show separability or reproduction of pipeline labels, not generalisation to independently
-    judged BCA status or biological outcomes. The discarded class means that no BCA signal was detected; it does not
-    mean biological ineffectiveness.
-
-    The ranking evaluation is a warm-start experiment over contexts with several observed BCAs. It does not measure
-    performance for a new crop-pathogen pair, a BCA absent from the candidate catalogue, or a future regulatory snapshot.
-    The labels inherit the coverage and regulatory bias of the authorisation sources. Because the triage weight is zero,
-    the classifier is not part of this ranking evaluation. The experiment uses the authorisation-derived final catalogue
-    and does not test end-to-end generalisation.
-
-
-    \section{Conclusion and Future Work}\label{sec:conclusions-and-future-work}
-
-    This work delivers a pipeline that combines authorisation data from different sources and a BCA ranker for crop
-    and pathogen queries. The system combines support counts with context similarity, keeps products as evidence, and
-    reports known and inferred candidates separately. The evaluation shows retrieval of observed authorisation
-    associations, not biological efficacy. The research question is therefore answered only for warm-start retrieval of
-    authorisation-derived associations: the system can recover held-out associations in the current Portuguese catalogue,
-    but it cannot establish efficacy, approval, or suitability for new uses.
-
-    Future work should first add structured sources with verified crop--pathogen pairs and evaluate the ranker with
-    independent efficacy or field data. It should then use a validation split to tune weights and test cold-start and
-    temporal settings. A bounded large language model (LLM) stage may assist irregular source mapping, but deterministic
-    validation and human review must check every suggestion before it enters the modelling table. Inferred mappings
-    cannot count as verified authorisation evidence.
-
-    \bibliographystyle{../ACM-Reference-Format}
+    \bibliographystyle{ACM-Reference-Format}
     \bibliography{references}
 
 \end{document}

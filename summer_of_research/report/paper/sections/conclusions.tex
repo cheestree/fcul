@@ -1,0 +1,14 @@
+\section{Conclusion and Future Work}\label{sec:conclusions-and-future-work}
+
+This work delivers a pipeline that combines authorisation data from different sources and a BCA ranker for crop
+and pathogen queries. The system combines support counts with context similarity, keeps products as evidence, and
+reports known and inferred candidates separately. The evaluation shows retrieval of observed authorisation
+associations, not biological efficacy. The research question is therefore answered only for warm-start retrieval of
+authorisation-derived associations: the system can recover held-out associations in the current Portuguese catalogue,
+but it cannot establish efficacy, approval, or suitability for new uses.
+
+Future work should first add structured sources with verified crop--pathogen pairs and evaluate the ranker with
+independent efficacy or field data. It should then use a validation split to tune weights and test cold-start and
+temporal settings. A bounded large language model (LLM) stage may assist irregular source mapping, but deterministic
+validation and human review must check every suggestion before it enters the modelling table. Inferred mappings
+cannot count as verified authorisation evidence.
