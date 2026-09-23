@@ -35,14 +35,14 @@ Common crop and pathogen names are excluded because their language varies across
 The TF-IDF vectorizer lowercases this text and represents both unigrams and bigrams, meaning individual terms and
 adjacent two-term phrases. Its weight is higher for a term that is frequent in one row but uncommon across the
 corpus, which lets the screening model distinguish informative names and phrases from broadly repeated terms. Terms seen
-in only one row are removed with $\mathit{min\_df}=2$, and the vocabulary is capped at 60,000 features. Balanced
-logistic regression uses the liblinear solver with 1,000 iterations. Reference-match flags, extracted genera, review
+in only one row are removed, and the vocabulary is capped at 60,000 features. We fit balanced logistic regression with
+a limit of 1,000 fitting iterations. Reference-match flags, extracted genera, review
 and discard reasons, and purpose text are excluded to reduce direct leakage from the pipeline decisions.
 
-We use one \texttt{GroupShuffleSplit} with 20\% held-out data and random state 42. A group is the lowercased
-combination of dataset, microbial value, common and scientific pathogen names, and product name. Thus repeated or
+We create one grouped random split with 20\% held-out data and a fixed seed for reproducibility. Each group combines the
+dataset, microbial value, common and scientific pathogen names, and product name. Thus repeated or
 closely related authorisation rows with the same key stay on one side of the split instead of appearing in both
-training and the held-out set. The stored split contains 155,041 training rows and 40,156 held-out rows. These metrics measure
+training and the held-out set. The split contains 155,041 training rows and 40,156 held-out rows. These metrics measure
 reproduction of screening outcomes derived from authorisation data.
 
 Accuracy is the proportion of held-out rows assigned the correct screening outcome at a probability threshold of $0.5$.
