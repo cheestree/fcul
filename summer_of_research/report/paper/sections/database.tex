@@ -1,23 +1,21 @@
 \subsection{Commercial BCA Database Creation} \label{subsec:commercial-bca-database}
 
-After source-specific parsing, the records are normalised and checked against curated microbe and pathogen reference
-data. The normalisation step removes formatting differences while retaining meaningful qualifiers. Missing values stay
-missing, and failed reference matches receive an explicit review reason. This keeps unresolved cases visible instead of
-turning them into assumed biological relationships.
+After source-specific parsing, the records are normalised and checked against curated microbe and pathogen reference data.
+The normalisation step removes formatting differences while retaining meaningful qualifiers.
+Missing values stay missing, and failed reference matches receive an explicit review reason.
+This keeps unresolved cases visible instead of turning them into assumed biological relationships.
 
-The database creation stage classifies records into three evidence states. A record enters 
-\textit{final} when it contains BCA evidence and has no unresolved review reason. A record enters \textit{review} when
-it contains BCA evidence but has an unresolved reference or crop--pathogen pair. All remaining records enter
-\textit{discarded}. These are authorisation evidence classes, not biological efficacy labels: a discarded record means
-that the pipeline found no BCA signal, not that the product or microorganism is ineffective.
+The database creation stage classifies records into three evidence states.
+A record enters \textit{final} when it contains BCA evidence and has no unresolved review reason.
+A record enters \textit{review} when it contains BCA evidence but has an unresolved reference or crop--pathogen pair.
+All remaining records enter \textit{discarded}.
+These are authorisation evidence classes, not biological efficacy labels: a discarded record means that the pipeline found no BCA signal, not that the product or microorganism is ineffective.
 
-The resulting commercial BCA database preserves the crop, pathogen, product, microbial active substance, source,
-authorisation, product function, and review fields available in each record. Product names remain linked to the
-canonical microbial active substance as traceable evidence. Only rows with complete scientific crop and pathogen pairs
-enter the joined modelling table. This prevents a product catalogue from being interpreted as a verified set of
-crop--pathogen uses.
+The resulting commercial BCA database preserves the crop, pathogen, product, microbial active substance, source, authorisation, product function, and review fields available in each record.
+Product names remain linked to the standardized microbial active substance value as traceable evidence.
+Only rows with complete scientific crop and pathogen pairs enter the joined modelling table.
+This prevents a product catalogue from being interpreted as a verified set of crop--pathogen uses.
 
-The current ranking database is built from accepted Portuguese records because they provide the complete fields needed
-for crop--pathogen evaluation. The other country outputs remain available for catalogue inspection and audit until
-their missing links can be validated. The final and review classes also provide weak labels for the diagnostic triage
-model evaluated later in the paper.
+The current ranking database is built from accepted Portuguese records because they provide the complete fields needed for crop--pathogen evaluation.
+The other country outputs remain available for catalogue inspection and audit until their missing links can be validated.
+The final and review classes also provide weak labels for the diagnostic triage model evaluated later in the paper.

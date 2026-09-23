@@ -1,28 +1,27 @@
 \subsection{Data}\label{subsec:data-sources-and-data-integration}
 
-We use four authorisation exports from the European Union \cite{eu-dataset-snapshot}, Spain \cite{spain-dataset-snapshot}, France \cite{france-dataset-snapshot}, and Portugal. 
-The sources differ in language, level of detail, and table structure, so each parser maps its columns to a shared schema. 
-The EU input ~\cite{ec-pesticides-database,eu-dataset-snapshot} provides microbial substances, authorisation status, approval dates, authorised countries, and functions, but no crop-pathogen authorisation relation. 
-The Spanish inputs are product, crop, and substance workbooks~\cite{mapa-regfiweb,spain-dataset-snapshot}; the product workbook is a \textbf{product catalogue}, while the crop and substance workbooks remain reference catalogues because no registration key links them safely to product uses. 
-The French input is the E-Phy usage export ~\cite{anses-ephy,france-dataset-snapshot}. 
-It provides authorised product-use rows and common crop and target labels, but not the scientific crop-pathogen pair required by the joined modelling data. 
-The Portuguese input consists of several official exports~\cite{dgav-sifito}. 
-These sources provide the most complete crop, pathogen, product, authorisation, and microbial substance fields and supply all rows in the current joined modelling data.
-Common fields include crop names, scientific crop names where available, target organisms, scientific pathogen names, product names, product functions, authorisation dates, and microbial active substances.
+We use four authorisation sources: the European Union, Spain, France, and Portugal~\cite{ec-pesticides-database, mapa-regfiweb,anses-ephy,dgav-sifito}.
+Each source has a different structure. We therefore create one parser per source and map the available fields to a shared schema.
 
-The Spanish product table does not link products to crops or pests, and the French use export lacks the scientific pair fields required by the joined modelling data. 
-The other country records remain available for catalogue inspection and audit. 
-Only Portuguese records currently enter the joined modelling data: 1,530 final rows, 10,160 review rows, and 183,507 discarded rows. 
-The other sources remain outside the ranking catalogue until their missing links can be validated.
+The shared schema includes crop, pathogen, product, microbial active substance, product function, authorisation status, dates, source, and review information.
+Fields that are not present in a source remain empty.
+The pipeline does not infer them.
 
-Before merging records, the pipeline checks each source for its required columns and skips files that fail the check. 
-It keeps optional fields when available. 
-The Portuguese source needs an expansion step because one row can list several target names and scientific names. 
-The parser expands safely paired names into crop, pathogen, and product records and sends ambiguous pairs to manual review.
+The sources do not provide the same type of evidence.
+The EU data contain active substances and authorisation information, but no complete crop--pathogen use relation~\cite{eu-dataset-snapshot}.
+The Spanish files provide product, crop, and substance catalogues, but no registration key that safely links products to uses~\cite{spain-dataset-snapshot}.
+The French E-Phy export provides product-use rows, but not the scientific crop--pathogen pairs required for modelling ~\cite{france-dataset-snapshot}.
+The Portuguese exports provide the most complete fields and supply the current joined modelling data~\cite{dgav-sifito}.
 
-After normalisation, the pipeline adds reference and review fields. 
-It matches microbe and pathogen names against curated reference lists after normalising accents, punctuation, and strain wording. 
-EPPO names and codes provide an external reference for plant and pest terminology~\cite{eppo-global-database}. 
-The pipeline marks a row as BCA related when its microbe value matches the microbe reference data or contains an explicit biological indicator such as a strain, virus, bacteriophage, or microorganism. 
-Rows with BCA signal and no review reason enter \textit{final}; rows with BCA signal and an unresolved reference or target pair enter \textit{review}; all remaining rows enter \textit{discarded}.
-These groups are evidence classes produced by the pipeline, not biological efficacy labels; discarded rows are retained for audit and used as negative examples for the classifier.
+These counts are derived from the parsed source files after combining them under the shared schema, checking their microbe and pathogen fields against the reference data, and retaining only complete scientific crop--pathogen pairs.
+The resulting joined modelling data contain 195,197 complete rows: 11,690 rows in the positive \textit{final} or \textit{review} classes and 183,507 \textit{discarded} rows.
+The ranking catalogue uses the 1,530 accepted Portuguese \textit{final} rows.
+After standardising microbial values, these rows contain 24 BCA values, 27 scientific pathogens, 166 scientific crops, and 36 products.
+They form 361 complete crop--pathogen contexts and 595 unique context--BCA interactions.
+A row is a source record; an interaction is the aggregated presence of one standardized BCA in one scientific crop--pathogen context, so the two counts should not be read as the same unit.
+
+During import, the pipeline checks required columns and keeps optional fields when available.
+It normalises accents, punctuation, and strain wording.
+It also expands Portuguese rows that contain several crop or target names.
+Ambiguous pairs are kept for review.
+EPPO names and codes support the reference checks~\cite{eppo-global-database}.

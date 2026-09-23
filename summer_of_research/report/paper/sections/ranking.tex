@@ -1,34 +1,44 @@
 \subsection{Recommender System}\label{subsec:recommendation-methodology}
 
-The recommender system takes the commercial BCA database as input and ranks the canonical microbial active-substance
-value. It represents a BCA or a listed BCA mixture. We keep
-products as evidence so users can inspect the authorisation records behind each candidate.
+The recommender uses the accepted Portuguese records. It ranks standardized microbial active-substance values. A value can
+represent one BCA or a listed BCA mixture. Products are retained as supporting evidence, not as the ranked items.
 
-We build the current ranking catalogue from Portuguese authorisation records only. Portugal is the only
-source that provides complete records for the required fields. We keep the other country outputs separate until we
-recover and validate their missing links.
+For each crop--pathogen query, the system performs four steps:
 
-We derive the interaction table from accepted \textit{final} rows; \textit{review} rows remain a separate
-unresolved queue. We normalise microbial mixture strings into a canonical order and remove duplicate components.
-Each row represents one crop-pathogen context and one canonical BCA value. We collapse repeated source rows into
-an interaction count and aggregate source, output class, product name, and product function. Support
-uses distinct products when available and interaction counts otherwise. Products remain \textit{evidence}, not ranked items.
+\begin{enumerate}
+    \item It builds a list of candidate BCAs from the database.
+    \item It calculates direct support for the query context and for the queried pathogen.
+    \item It calculates an item-based collaborative filtering score.
+    \item It combines these signals into one ranking score.
+\end{enumerate}
 
-We treat each crop-pathogen context as an implicit user and each BCA as an item. The interaction table becomes a
-context-item matrix. We retain interaction counts for support features but use binary presence for similarity.
-The collaborative component computes cosine similarity between BCA vectors, prefers contexts with the same
-pathogen, and falls back to global contexts when necessary. It shrinks similarities when item overlap is small
-and scores each candidate from its two strongest similarities to the observed query BCAs. If the query has no
-observed items, the collaborative score is zero and direct support provides the fallback.
+The collaborative component is an item-based $k$-nearest-neighbour (KNN) collaborative filtering method. Collaborative
+filtering uses the observed co-occurrence of items in contexts. Here, each crop--pathogen context acts as an implicit
+user, and each standardized BCA value acts as an item. The system builds a binary context--item matrix. Rows are BCA
+values, columns are crop--pathogen contexts, and a cell is one when the BCA occurs in that context.
 
-The ranker combines context, pathogen, and collaborative support. It also computes crop, total, and dataset
-support, but assigns them zero weight. It normalises count features within the candidate set before weighting them.
-The current weights are $0.475$ for known context
-matches, $0.190$ for context support, $0.285$ for pathogen support, and $0.050$ for collaborative similarity;
-crop, total, and dataset support have weight zero. The query also reports the triage score as a diagnostic, but
-does not use it for ordering in the current evaluation. Its weight is zero and the value remains available for
-audit and manual review.
+The system represents each BCA as a vector over the contexts and computes pairwise cosine similarity between these
+vectors. It first restricts the matrix to contexts with the same pathogen. If the observed query BCAs are not available
+in that matrix, it falls back to all contexts. Similarities are shrunk when the overlap between two BCAs is small. For
+each candidate, the collaborative score is the mean similarity to the two most similar observed BCAs, or to fewer BCAs
+when fewer than two are available. Thus, the collaborative component uses $k=2$ nearest BCA items. KNN is used here
+to select similar items, not as a supervised KNN classifier.
 
-The query matches case-insensitive literal text in the scientific crop and common or scientific pathogen fields.
-It separates known matches from inferred candidates. Inferred candidates come from related authorisation evidence;
-they do not establish a new authorisation or a biological efficacy claim.
+The final score is a weighted sum:
+
+\begin{equation}
+    s = 0.50K + 0.20C + 0.25P + 0.05F,
+\end{equation}
+
+where $K$ is the known-match signal, $C$ is context support, $P$ is pathogen support, and $F$ is the collaborative
+filtering score. Count features are normalised within each candidate set. The weights were selected manually rather than
+learned from the data. The initial direct-support allocation was $0.50$ for known matches, $0.20$ for context support,
+and $0.30$ for pathogen support. We reserved $0.05$ for collaborative similarity and reduced the pathogen-support
+weight to $0.25$ so that the weights still sum to $1.00$. This gives the exact context match the largest individual
+weight, keeps direct support dominant, and limits the influence of indirect similarity. No weight learning or parameter
+search was used, and the weights remain fixed during evaluation. The reported metrics therefore describe this transparent
+configuration rather than an optimised set of weights. Crop, total, dataset, and triage scores are reported for
+inspection but do not affect the ranking.
+
+The output separates known matches from inferred candidates. An inferred candidate is supported by related
+authorisation records. It does not establish a new authorisation or biological efficacy.

@@ -1,10 +1,17 @@
 \section{Results}\label{sec:results-and-project-outcomes}
 
-The classifier reproduced the weak labels perfectly: accuracy, macro F1, ROC AUC, and average precision are all
-$1.000$. These values show that it reproduced the pipeline output classes in this split; they do not measure
-biological efficacy.
+The four classifier metrics are $1.000$ on the grouped holdout. This reflects the strong separation between the
+pipeline-generated classes in the input record fields, as explained in Section~\ref{sec:evaluation-design}. It shows
+reproduction of the pipeline labels in this split, not independent biological validation or efficacy.
 
-Table~\ref{tab:ranking-results} reports the inferred-only results. It separates candidate recovery, measured by
+Table~\ref{tab:ranking-results} reports the inferred-only results. The variants are scoring ablations over the same
+held-out cases, not different data splits. \textit{Hybrid} uses the full fixed weighted score, combining exact-context,
+context, pathogen, and collaborative support. \textit{Direct support} removes the collaborative component and uses
+only the direct authorisation signals. \textit{Collaborative} uses only the item-similarity score. \textit{Pathogen
+    baseline} ranks candidates by pathogen-level support, while \textit{Total baseline} ranks them by support across all
+contexts. After each ranking, the inferred-only view removes candidates with an exact query-context match; this is why
+the table evaluates candidates that are supported by related evidence rather than already known for the queried pair.
+The table separates candidate recovery, measured by
 coverage and HitRate@k, from rank quality, measured by MRR and NDCG@10. Coverage is the fraction of queries in
 which the held-out BCA remains in the candidate catalogue. HitRate@k is the fraction of queries that recover it in
 the first $k$ positions. MRR rewards higher ranks, and NDCG@10 gives less weight to lower-ranked hits.
@@ -18,7 +25,7 @@ the first $k$ positions. MRR rewards higher ranks, and NDCG@10 gives less weight
     \renewcommand{\arraystretch}{1.15}
     \begin{tabular}{lrrrr}
         \hline
-        \multicolumn{5}{l}{\textit{Candidate recovery}} \\
+        \multicolumn{5}{l}{\textit{Candidate recovery}}                                           \\
         \textbf{Variant}  & \textbf{Coverage} & \textbf{Hit@1} & \textbf{Hit@5} & \textbf{Hit@10} \\
         \hline
         Hybrid            & 98.2\%            & 60.6\%         & 93.6\%         & 98.2\%          \\
@@ -31,7 +38,7 @@ the first $k$ positions. MRR rewards higher ranks, and NDCG@10 gives less weight
     \vspace{3pt}
     \begin{tabular}{lrr}
         \hline
-        \multicolumn{3}{l}{\textit{Rank quality}} \\
+        \multicolumn{3}{l}{\textit{Rank quality}}           \\
         \textbf{Variant}  & \textbf{MRR} & \textbf{NDCG@10} \\
         \hline
         Hybrid            & 0.749        & 0.807            \\
