@@ -15,13 +15,6 @@ The Spanish files provide product, crop, and substance catalogues, but no regist
 The French E-Phy export provides product-use rows, but not the scientific crop--pathogen pairs required for modelling ~\cite{france-dataset-snapshot}.
 The Portuguese exports provide the most complete fields and supply the current joined modelling data~\cite{dgav-sifito}.
 
-These counts are derived from the parsed source files after combining them under the shared schema, checking their microbe and pathogen fields against the reference data, and retaining only complete scientific crop--pathogen pairs.
-The resulting joined modelling data contain 195,197 complete rows: 11,690 rows in the positive \textit{final} or \textit{review} classes and 183,507 \textit{discarded} rows.
-The ranking catalogue uses the 1,530 accepted Portuguese \textit{final} rows.
-After standardising microbial values, these rows contain 24 BCA values, 27 scientific pathogens, 166 scientific crops, and 36 products.
-They form 361 complete crop--pathogen contexts and 595 unique context--BCA interactions.
-A row is a source record; an interaction is the aggregated presence of one standardized BCA in one scientific crop--pathogen context, so the two counts should not be read as the same unit.
-
 During import, the pipeline checks required columns and keeps optional fields when available.
 It normalises accents, punctuation, and strain wording.
 It also expands Portuguese rows that contain several crop or target names.

@@ -1,5 +1,13 @@
 \section{Discussion}\label{sec:discussion}
 
+The main limitation is coverage rather than the number of source rows. Although the joined modelling data contain many
+records, the ranking catalogue uses only 1,530 accepted Portuguese \textit{final} rows because the other sources do not
+provide the same safe scientific crop--pathogen links. These rows form 361 complete contexts and 595 context--BCA
+interactions, while the ranking evaluation uses only the 109 contexts with at least two observed BCAs. Repeated
+authorisation rows should not be read as independent biological observations. The 98.2\% candidate coverage therefore
+means that the held-out BCA remained in the catalogue for 107 of these 109 contexts; it does not indicate broad coverage
+of new crop--pathogen pairs.
+
 A pathogen support signal accounts for much of the ranking behaviour in the current data. The sources repeat
 authorisation records around target organisms, while a missing record does not provide a reliable negative label.
 The hybrid ranker slightly improves on direct support alone in HitRate@5, MRR, and NDCG@10. Collaborative support
@@ -14,8 +22,11 @@ perfect scores therefore show separability or reproduction of pipeline labels, n
 judged BCA status or biological outcomes. The discarded class means that no BCA signal was detected; it does not
 mean biological ineffectiveness.
 
-The ranking evaluation uses contexts with several observed BCAs. It does not measure
-performance for a new crop-pathogen pair, a BCA absent from the candidate catalogue, or a future regulatory snapshot.
+The ranking evaluation uses contexts with several observed BCAs. It does not measure performance for a new crop-pathogen
+pair, a BCA absent from the candidate catalogue, or a future regulatory snapshot. Scarce verified use-level data also
+limit comparisons across countries and make the current evaluation dependent on the Portuguese catalogue. Expanding the
+catalogue with inferred links could increase apparent coverage, but would replace a missing observation with an assumption
+and would weaken the meaning of the evaluation.
 The labels inherit the coverage and regulatory bias of the authorisation sources. Because the screening weight is zero,
 the classifier is not part of this ranking evaluation. The experiment uses the authorisation-derived final catalogue
 and does not test end-to-end generalisation.

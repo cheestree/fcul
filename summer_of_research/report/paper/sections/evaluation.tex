@@ -2,23 +2,23 @@
 
 \begin{strip}
     \centering
-    \captionof{table}{Evaluation stages, inputs, and outputs.}
+    \captionof{table}{Evaluation stages, inputs, and procedures.}
     \label{tab:experimental-setup}
     \scriptsize
     \setlength{\tabcolsep}{3pt}
     \renewcommand{\arraystretch}{1.15}
     \begin{tabular}{p{0.12\textwidth} p{0.20\textwidth} p{0.40\textwidth} p{0.20\textwidth}}
         \hline
-        \textbf{Stage} & \textbf{Input}                                                                     & \textbf{Processing or model}                                                                                                          & \textbf{Output}                                                                                                 \\
+        \textbf{Stage} & \textbf{Input}                                                                     & \textbf{Processing or model}                                                                                                          & \textbf{Assessment}                                                                                             \\
         \hline
-        Pipeline       & Four authorisation exports.                                                        & Source-specific parsing, field normalisation, reference matching, and separation into final, review, and discarded rows.              & 1,530 final rows, 10,160 review rows, and 183,507 discarded rows in the joined modelling data.                  \\
-        Classifier     & 195,197 joined rows: 11,690 positive final/review rows and 183,507 discarded rows. & TF-IDF text features with balanced logistic regression. An 80/20 grouped split is made by dataset, microbe, pathogen, and product. & 155,041 training rows and 40,156 held-out rows; accuracy, macro F1, ROC AUC, and average precision of $1.000$.   \\
-        Ranking        & 1,530 accepted Portuguese final rows and 595 unique context--BCA interactions.     & One BCA edge is held out from each of 109 complete contexts containing at least two BCAs.                                             & Hybrid direct-support and collaborative ranking, with results for inferred candidates in Table~\ref{tab:ranking-results}. \\
+        Pipeline       & Four authorisation exports.                                                        & Source-specific parsing, field normalisation, reference matching, and separation into final, review, and discarded rows.              & Schema, required-column, target-expansion, and output-file checks.                                             \\
+        Classifier     & Joined rows with pipeline-generated classes.                                       & TF-IDF text features with balanced logistic regression. An 80/20 grouped split is made by dataset, microbe, pathogen, and product. & Grouped holdout evaluation with accuracy, macro F1, ROC AUC, and average precision.                            \\
+        Ranking        & Accepted Portuguese final rows and context--BCA interactions.                     & One BCA edge is held out from each complete context containing at least two BCAs.                                                        & Coverage, HitRate@k, MRR, and NDCG@10 for inferred candidates.                                                  \\
         \hline
     \end{tabular}
 \end{strip}
 
-Table~\ref{tab:experimental-setup} summarises the three evaluation stages and their outputs.
+Table~\ref{tab:experimental-setup} summarises the three evaluation stages and their procedures.
 The evaluation follows the phase boundaries in Figure~\ref{fig:pipeline}: we assess the pipeline, classifier, and ranker separately.
 Pipeline checks confirm that the parsers produce the expected schema, required columns exist, target expansion produces auditable rows, and each data set produces the expected \textit{final}, \textit{review}, and \textit{discarded} files.
 
@@ -43,37 +43,10 @@ closely related authorisation rows with the same key stay on one side of the spl
 training and the held-out set. The stored split contains 155,041 training rows and 40,156 held-out rows. These metrics measure
 reproduction of labels derived from authorisation data.
 
-Table~\ref{tab:classifier-metrics} reports the classifier metrics on the held-out set.
-
-\begin{table}[H]
-    \caption{Classifier metrics on the grouped held-out set ($n=40{,}156$).}
-    \label{tab:classifier-metrics}
-    \centering
-    \small
-    \begin{tabular}{lr}
-        \hline
-        \textbf{Metric}   & \textbf{Value} \\
-        \hline
-        Accuracy          & 1.000          \\
-        Macro F1          & 1.000          \\
-        ROC AUC           & 1.000          \\
-        Average precision & 1.000          \\
-        \hline
-    \end{tabular}
-\end{table}
-
 Accuracy is the proportion of held-out rows assigned the correct class at a probability threshold of $0.5$.
 Macro F1 is the mean F1 score for the positive and negative classes, giving both classes equal importance despite their
 unequal frequencies. ROC AUC measures how well the predicted probabilities separate the two classes across thresholds.
 Average precision summarises the precision--recall trade-off for the positive class.
-
-All four metrics are $1.000$ on this held-out set. This does not mean that the classifier learned biological efficacy. The
-labels were created by the same pipeline rules that produced the input records: final and review rows contain BCA
-related evidence, while discarded rows contain no detected BCA signal. Several input fields, especially the microbial
-active substance, product name, and product function, are therefore strong clues to the assigned label.
-The grouped split keeps repeated dataset--microbe--pathogen--
-product combinations together, but related vocabulary and source patterns remain available on both sides. The values
-therefore show reproduction of the current pipeline labels on this held-out set, not performance on independent judgments.
 
 For ranking, a context is one unique crop--pathogen query, identified by its scientific crop and scientific pathogen
 names. It is not a source row or a product. A context may contain several standardized BCA values and repeated
@@ -82,10 +55,8 @@ counts as evidence. We evaluate the 109 complete contexts with at least two dist
 deterministic context--BCA edge from each. We remove the edge before
 building features, then rank the held-out BCA among the remaining candidate catalogue. For reproducibility, contexts
 are ordered by their scientific crop and pathogen names and the alphabetically last standardized BCA value is
-selected as the held-out edge. Unavailable targets are counted as misses; 107 of 109 cases in the view of inferred candidates remain
-covered (98.2\%). We report results for all candidates and for a view of inferred candidates, which removes candidates that
-still have a known context match and corresponds to the query interface. The all-candidate hybrid result is reported
-below for completeness.
+selected as the held-out edge. We report results for all candidates and for a view of inferred candidates, which removes
+candidates that still have a known context match and corresponds to the query interface.
 
 We measure ranking quality with HitRate@1, HitRate@5, HitRate@10, mean reciprocal rank (MRR), and normalised
 discounted cumulative gain (NDCG), following standard cumulative-gain evaluation for ranked retrieval.
