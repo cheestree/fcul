@@ -1,5 +1,7 @@
 \subsection{Commercial BCA Database Creation} \label{subsec:commercial-bca-database}
 
+The Commercial BCA database phase in Figure~\ref{fig:pipeline} turns the shared records into evidence states while preserving the source fields needed for later inspection and ranking.
+
 After source-specific parsing, the records are normalised and checked against curated microbe and pathogen reference data.
 The normalisation step removes formatting differences while retaining meaningful qualifiers.
 Missing values stay missing, and failed reference matches receive an explicit review reason.

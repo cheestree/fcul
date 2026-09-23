@@ -1,5 +1,7 @@
 \subsection{Data}\label{subsec:data-sources-and-data-integration}
 
+The Data phase in Figure~\ref{fig:pipeline} turns heterogeneous authorisation exports into a shared and auditable data layer.
+
 We use four authorisation sources: the European Union, Spain, France, and Portugal~\cite{ec-pesticides-database, mapa-regfiweb,anses-ephy,dgav-sifito}.
 Each source has a different structure. We therefore create one parser per source and map the available fields to a shared schema.
 
