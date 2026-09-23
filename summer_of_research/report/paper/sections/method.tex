@@ -20,8 +20,8 @@ Figure~\ref{fig:pipeline} shows how these phases connect: the Data phase produce
 
 The stages are evaluated separately. This keeps data processing, database creation, and recommendation distinct.
 
-As a preliminary screening step, the pipeline also applies a text classifier to the processed records. TF-IDF converts the
+As a preliminary screening step, the pipeline also applies a text-based screening model to the processed records. TF-IDF converts the
 selected row fields into weighted sparse features, giving more weight to terms and phrases that distinguish a row and
 less weight to terms repeated across the corpus. Logistic regression then learns a linear boundary between the
-authorization-derived BCA-related and non-BCA classes. This classifier reproduces pipeline labels; its scores are not
+authorization-derived BCA-related and no-signal outcomes. This screening model reproduces pipeline outcomes; its scores are not
 biological efficacy estimates.

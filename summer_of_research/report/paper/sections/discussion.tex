@@ -9,17 +9,17 @@ means that the held-out BCA remained in the catalogue for 107 of these 109 conte
 of new crop--pathogen pairs.
 
 A pathogen support signal accounts for much of the ranking behaviour in the current data. The sources repeat
-authorisation records around target organisms, while a missing record does not provide a reliable negative label.
+authorisation records around target organisms, while a missing record does not provide reliable evidence of absence.
 The hybrid ranker slightly improves on direct support alone in HitRate@5, MRR, and NDCG@10. Collaborative support
 alone performs worse. The improvement over direct support is small: $+0.9$ percentage points in Hit@5, $+0.006$
 MRR, and $+0.005$ NDCG@10. No confidence intervals or significance test are available, so these differences should be treated as
 descriptive evidence for a possible small benefit from collaboration rather than as a firm improvement.
 
-The classifier results also need a narrow interpretation. The grouped held-out set keeps related source, microbe, pathogen,
+The screening-model results also need a narrow interpretation. The grouped held-out set keeps related source, microbe, pathogen,
 and product rows on the same side of the split, and rule-derived match and review fields are excluded. However, the
-labels are generated from the same authorisation records and related fields that supply the model features. The
-perfect scores therefore show separability or reproduction of pipeline labels, not generalisation to independently
-judged BCA status or biological outcomes. The discarded class means that no BCA signal was detected; it does not
+screening outcomes are generated from the same authorisation records and related fields that supply the model features. The
+perfect scores therefore show separability or reproduction of pipeline outcomes, not generalisation to independently
+judged BCA status or biological outcomes. The discarded state means that no BCA signal was detected; it does not
 mean biological ineffectiveness.
 
 The ranking evaluation uses contexts with several observed BCAs. It does not measure performance for a new crop-pathogen
@@ -27,6 +27,6 @@ pair, a BCA absent from the candidate catalogue, or a future regulatory snapshot
 limit comparisons across countries and make the current evaluation dependent on the Portuguese catalogue. Expanding the
 catalogue with inferred links could increase apparent coverage, but would replace a missing observation with an assumption
 and would weaken the meaning of the evaluation.
-The labels inherit the coverage and regulatory bias of the authorisation sources. Because the screening weight is zero,
-the classifier is not part of this ranking evaluation. The experiment uses the authorisation-derived final catalogue
+The screening outcomes inherit the coverage and regulatory bias of the authorisation sources. Because the screening weight is zero,
+the screening model is not part of this ranking evaluation. The experiment uses the authorisation-derived final catalogue
 and does not test end-to-end generalisation.

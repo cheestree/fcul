@@ -12,41 +12,43 @@
         \textbf{Stage} & \textbf{Input}                                                                     & \textbf{Processing or model}                                                                                                          & \textbf{Assessment}                                                                                             \\
         \hline
         Pipeline       & Four authorisation exports.                                                        & Source-specific parsing, field normalisation, reference matching, and separation into final, review, and discarded rows.              & Schema, required-column, target-expansion, and output-file checks.                                             \\
-        Classifier     & Joined rows with pipeline-generated classes.                                       & TF-IDF text features with balanced logistic regression. An 80/20 grouped split is made by dataset, microbe, pathogen, and product. & Grouped holdout evaluation with accuracy, macro F1, ROC AUC, and average precision.                            \\
+        Screening model & Complete rows with a pipeline screening outcome.                                  & TF-IDF text features with balanced logistic regression. An 80/20 grouped split is made by dataset, microbe, pathogen, and product. & Agreement with held-out pipeline outcomes: accuracy, macro F1, ROC AUC, and average precision.                  \\
         Ranking        & Accepted Portuguese final rows and context--BCA interactions.                     & One BCA edge is held out from each complete context containing at least two BCAs.                                                        & Coverage, HitRate@k, MRR, and NDCG@10 for inferred candidates.                                                  \\
         \hline
     \end{tabular}
 \end{strip}
 
 Table~\ref{tab:experimental-setup} summarises the three evaluation stages and their procedures.
-The evaluation follows the phase boundaries in Figure~\ref{fig:pipeline}: we assess the pipeline, classifier, and ranker separately.
+The evaluation follows the phase boundaries in Figure~\ref{fig:pipeline}: we assess the data pipeline, a diagnostic screening model, and the ranker separately.
 Pipeline checks confirm that the parsers produce the expected schema, required columns exist, target expansion produces auditable rows, and each data set produces the expected \textit{final}, \textit{review}, and \textit{discarded} files.
 
-The classifier uses the generated classes as labels produced by the pipeline.
-Rows in \textit{final} and \textit{review} receive the positive label because they contain BCA evidence or need BCA related review.
-The rows in \textit{discarded} receive the
-negative label because the pipeline did not find a BCA signal. Only rows with complete scientific crop and pathogen
-pairs enter training. For each row, the model concatenates labelled values from the microbial active substance,
+The screening-model evaluation asks a narrow question: can a text model reproduce the pipeline's own row-level screening outcomes on records it did not see during training?
+
+For this test, rows in \textit{final} and \textit{review} are treated as BCA-related because they contain BCA evidence or require BCA-related review.
+Rows in \textit{discarded} are treated as having no detected BCA signal because the pipeline did not find sufficient evidence.
+These are operational screening outcomes, not biological efficacy assessments.
+Only rows with complete scientific crop and pathogen
+pairs enter training. For each row, the model concatenates selected values from the microbial active substance,
 scientific crop, scientific pathogen, product, product function, dataset, and pathogen taxon specificity fields.
 Common crop and pathogen names are excluded because their language varies across datasets.
 
 The TF-IDF vectorizer lowercases this text and represents both unigrams and bigrams, meaning individual terms and
 adjacent two-term phrases. Its weight is higher for a term that is frequent in one row but uncommon across the
-corpus, which lets the classifier distinguish informative names and phrases from broadly repeated terms. Terms seen
+corpus, which lets the screening model distinguish informative names and phrases from broadly repeated terms. Terms seen
 in only one row are removed with $\mathit{min\_df}=2$, and the vocabulary is capped at 60,000 features. Balanced
 logistic regression uses the liblinear solver with 1,000 iterations. Reference-match flags, extracted genera, review
 and discard reasons, and purpose text are excluded to reduce direct leakage from the pipeline decisions.
 
-We use one \texttt{GroupShuffleSplit} with 20\% held-out data, random state 42. The group key is the lowercased
+We use one \texttt{GroupShuffleSplit} with 20\% held-out data and random state 42. A group is the lowercased
 combination of dataset, microbial value, common and scientific pathogen names, and product name. Thus repeated or
 closely related authorisation rows with the same key stay on one side of the split instead of appearing in both
 training and the held-out set. The stored split contains 155,041 training rows and 40,156 held-out rows. These metrics measure
-reproduction of labels derived from authorisation data.
+reproduction of screening outcomes derived from authorisation data.
 
-Accuracy is the proportion of held-out rows assigned the correct class at a probability threshold of $0.5$.
-Macro F1 is the mean F1 score for the positive and negative classes, giving both classes equal importance despite their
-unequal frequencies. ROC AUC measures how well the predicted probabilities separate the two classes across thresholds.
-Average precision summarises the precision--recall trade-off for the positive class.
+Accuracy is the proportion of held-out rows assigned the correct screening outcome at a probability threshold of $0.5$.
+Macro F1 is the mean F1 score for the BCA-related and no-signal outcomes, giving both outcomes equal importance despite their
+unequal frequencies. ROC AUC measures how well the predicted probabilities separate the two outcomes across thresholds.
+Average precision summarises the precision--recall trade-off for the BCA-related outcome.
 
 For ranking, a context is one unique crop--pathogen query, identified by its scientific crop and scientific pathogen
 names. It is not a source row or a product. A context may contain several standardized BCA values and repeated
