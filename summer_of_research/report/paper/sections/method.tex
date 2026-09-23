@@ -5,12 +5,12 @@ The methodology has three stages:
 \begin{enumerate}
     \item \textbf{Data}: collect, parse, and normalise authorisation records.
     \item \textbf{Commercial BCA database}: select BCA-related records and preserve their evidence and review state.
-    \item \textbf{Recommender system}: rank microbial BCAs for a crop--pathogen query.
+    \item \textbf{Recommendation}: rank microbial BCAs for a crop--pathogen query.
 \end{enumerate}
 
 The stages are evaluated separately. This keeps data processing, database creation, and recommendation distinct.
 
-As a diagnostic triage step, the pipeline also applies a text classifier to the processed records. TF-IDF converts the
+As a preliminary screening step, the pipeline also applies a text classifier to the processed records. TF-IDF converts the
 selected row fields into weighted sparse features, giving more weight to terms and phrases that distinguish a row and
 less weight to terms repeated across the corpus. Logistic regression then learns a linear boundary between the
 authorization-derived BCA-related and non-BCA classes. This classifier reproduces pipeline labels; its scores are not

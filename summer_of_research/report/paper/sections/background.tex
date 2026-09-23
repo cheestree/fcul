@@ -1,17 +1,11 @@
 \section{Background}\label{sec:background-and-context}
 
-Pests and plant diseases cause substantial crop losses, so crop protection is important for agricultural production; it's necessary to eradicate both plagues and plant diseases.
-Many products use chemical substances, which are harmful to both the environment and the very crop they are trying to treat, and as such we need to bet on biological control agents (BCAs).
-BCAs can contribute to integrated pest management as alternatives.
-Their practical use depends on the crop, target organism, microbial strain, formulation, application conditions, and regulatory context.
-Microbial agents can act through several mechanisms, including plant defence induction, competition, hyperparasitism, and antibiosis.
-These mechanisms and their dependence on the local environment make evidence from an authorisation record different from evidence of efficacy in a new field setting.
+Pests and plant diseases can reduce crop production and quality. Crop protection is therefore important for agriculture. Pest management combines different methods and considers economic, health, and environmental concerns when managing pests and diseases~\cite{fao-ipm}.
+Biological control agents (BCAs) can be one part of this approach. Their use depends on the crop, target organism, microbial strain, formulation, application conditions, and regulatory context~\cite{fao-ipm,plantpathorec-project}. An authorisation record shows that a product or active substance is registered for a use; it does not by itself show how well it will work in a new field setting.
 
-Recommender Systems (RS) are software tools used for recommending the most suitable items based on a user's profile.
-RS have been largely applied to fields such as movies, music, and books.
-Recently, they have been studied as alternatives to predict links in scientific items, such as chemical compounds, genes and BCAs.
+Recommender systems help users find and rank items based on available information. They have been used in fields such as films, music, and books, and are now also being studied for scientific and agricultural data.
 The project PlantPathoRec \cite{plantpathorec-project}, whose goal is to create a platform for both researchers and farmers, intends to recommend new and commercial BCAs to treat plant diseases, using RS approaches.
-This projects goal is to contribute to the recommendation of commercial BCAs.
+This project's goal is to contribute to the recommendation of commercial BCAs.
 
 \subsection{Related Work}
 
@@ -20,6 +14,6 @@ It provides a multilingual directory of nationally registered biocontrol and bio
 Its product information is collected from official government sources and reviewed by scientists \cite{cabi-bioprotection-portal}.
 The Portal is therefore well suited to product discovery and regulatory lookup.
 
-The public Portal presents search and filtering over registered products, but it does not describe a transparent collaborative recommender that ranks BCA candidates from context--item interactions.
+The public Portal presents search and filtering over registered products, but it does not describe a transparent method that ranks BCA candidates from shared crop and pest information.
 Its underlying data are also not provided as an open downloadable dataset through the public interface; CABI presents raw datasets, dashboards, and API access as data services \cite{cabi-bioprotection-data}.
 Our work addresses this different objective by documenting an integrated authorisation dataset and using it to rank authorisation-derived BCA candidates, while retaining products as traceable evidence.

@@ -7,15 +7,15 @@ alone performs worse. The improvement over direct support is small: $+0.9$ perce
 MRR, and $+0.005$ NDCG@10. No confidence intervals or significance test are available, so these differences should be treated as
 descriptive evidence for a possible small benefit from collaboration rather than as a firm improvement.
 
-The classifier results also need a narrow interpretation. Grouped holdout keeps related source, microbe, pathogen,
+The classifier results also need a narrow interpretation. The grouped held-out set keeps related source, microbe, pathogen,
 and product rows on the same side of the split, and rule-derived match and review fields are excluded. However, the
 labels are generated from the same authorisation records and related fields that supply the model features. The
 perfect scores therefore show separability or reproduction of pipeline labels, not generalisation to independently
 judged BCA status or biological outcomes. The discarded class means that no BCA signal was detected; it does not
 mean biological ineffectiveness.
 
-The ranking evaluation is a warm-start experiment over contexts with several observed BCAs. It does not measure
+The ranking evaluation uses contexts with several observed BCAs. It does not measure
 performance for a new crop-pathogen pair, a BCA absent from the candidate catalogue, or a future regulatory snapshot.
-The labels inherit the coverage and regulatory bias of the authorisation sources. Because the triage weight is zero,
+The labels inherit the coverage and regulatory bias of the authorisation sources. Because the screening weight is zero,
 the classifier is not part of this ranking evaluation. The experiment uses the authorisation-derived final catalogue
 and does not test end-to-end generalisation.

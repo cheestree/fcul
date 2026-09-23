@@ -12,16 +12,17 @@
         \textbf{Stage} & \textbf{Input}                                                                     & \textbf{Processing or model}                                                                                                          & \textbf{Output}                                                                                                 \\
         \hline
         Pipeline       & Four authorisation exports.                                                        & Source-specific parsing, field normalisation, reference matching, and separation into final, review, and discarded rows.              & 1,530 final rows, 10,160 review rows, and 183,507 discarded rows in the joined modelling data.                  \\
-        Classifier     & 195,197 joined rows: 11,690 positive final/review rows and 183,507 discarded rows. & TF-IDF text features with balanced logistic regression. An 80/20 grouped holdout is split by dataset, microbe, pathogen, and product. & 155,041 training rows and 40,156 holdout rows; accuracy, macro F1, ROC AUC, and average precision of $1.000$.   \\
-        Ranking        & 1,530 accepted Portuguese final rows and 595 unique context--BCA interactions.     & One BCA edge is held out from each of 109 complete contexts containing at least two BCAs.                                             & Hybrid direct-support and collaborative ranking, with inferred-only results in Table~\ref{tab:ranking-results}. \\
+        Classifier     & 195,197 joined rows: 11,690 positive final/review rows and 183,507 discarded rows. & TF-IDF text features with balanced logistic regression. An 80/20 grouped split is made by dataset, microbe, pathogen, and product. & 155,041 training rows and 40,156 held-out rows; accuracy, macro F1, ROC AUC, and average precision of $1.000$.   \\
+        Ranking        & 1,530 accepted Portuguese final rows and 595 unique context--BCA interactions.     & One BCA edge is held out from each of 109 complete contexts containing at least two BCAs.                                             & Hybrid direct-support and collaborative ranking, with results for inferred candidates in Table~\ref{tab:ranking-results}. \\
         \hline
     \end{tabular}
 \end{strip}
 
+Table~\ref{tab:experimental-setup} summarises the three evaluation stages and their outputs.
 We evaluate the pipeline, classifier, and ranker separately.
 Pipeline checks confirm that the parsers produce the expected schema, required columns exist, target expansion produces auditable rows, and each data set produces the expected \textit{final}, \textit{review}, and \textit{discarded} files.
 
-The classifier uses the generated classes as weak labels.
+The classifier uses the generated classes as labels produced by the pipeline.
 Rows in \textit{final} and \textit{review} receive the positive label because they contain BCA evidence or need BCA related review.
 The rows in \textit{discarded} receive the
 negative label because the pipeline did not find a BCA signal. Only rows with complete scientific crop and pathogen
@@ -36,16 +37,16 @@ in only one row are removed with $\mathit{min\_df}=2$, and the vocabulary is cap
 logistic regression uses the liblinear solver with 1,000 iterations. Reference-match flags, extracted genera, review
 and discard reasons, and purpose text are excluded to reduce direct leakage from the pipeline decisions.
 
-We use one \texttt{GroupShuffleSplit} with a 20\% holdout, random state 42. The group key is the lowercased
+We use one \texttt{GroupShuffleSplit} with 20\% held-out data, random state 42. The group key is the lowercased
 combination of dataset, microbial value, common and scientific pathogen names, and product name. Thus repeated or
 closely related authorisation rows with the same key stay on one side of the split instead of appearing in both
-training and holdout. The stored split contains 155,041 training rows and 40,156 holdout rows. These metrics measure
+training and the held-out set. The stored split contains 155,041 training rows and 40,156 held-out rows. These metrics measure
 reproduction of labels derived from authorisation data.
 
-Table~\ref{tab:classifier-metrics} reports the classifier metrics on the holdout set.
+Table~\ref{tab:classifier-metrics} reports the classifier metrics on the held-out set.
 
 \begin{table}[H]
-    \caption{Classifier metrics on the grouped holdout set ($n=40{,}156$).}
+    \caption{Classifier metrics on the grouped held-out set ($n=40{,}156$).}
     \label{tab:classifier-metrics}
     \centering
     \small
@@ -61,17 +62,18 @@ Table~\ref{tab:classifier-metrics} reports the classifier metrics on the holdout
     \end{tabular}
 \end{table}
 
-Accuracy is the proportion of holdout rows assigned the correct class at a probability threshold of $0.5$.
+Accuracy is the proportion of held-out rows assigned the correct class at a probability threshold of $0.5$.
 Macro F1 is the mean F1 score for the positive and negative classes, giving both classes equal importance despite their
 unequal frequencies. ROC AUC measures how well the predicted probabilities separate the two classes across thresholds.
 Average precision summarises the precision--recall trade-off for the positive class.
 
-All four metrics are $1.000$ because the two generated classes are strongly separated by the information in the
-authorisation rows. Final and review rows contain detected BCA evidence, while discarded rows do not contain an
-accepted BCA signal. The classifier receives the microbial active substance, product name, and product-function fields,
-which preserve this distinction in the input text. The grouped split prevents repeated dataset--microbe--pathogen--product
-groups from appearing on both sides, but it does not make the labels independent biological observations. The values
-therefore show reproduction of the pipeline's weak labels, not biological efficacy, safety, or legal suitability.
+All four metrics are $1.000$ on this held-out set. This does not mean that the classifier learned biological efficacy. The
+labels were created by the same pipeline rules that produced the input records: final and review rows contain BCA
+related evidence, while discarded rows contain no detected BCA signal. Several input fields, especially the microbial
+active substance, product name, and product function, are therefore strong clues to the assigned label.
+The grouped split keeps repeated dataset--microbe--pathogen--
+product combinations together, but related vocabulary and source patterns remain available on both sides. The values
+therefore show reproduction of the current pipeline labels on this held-out set, not performance on independent judgments.
 
 For ranking, a context is one unique crop--pathogen query, identified by its scientific crop and scientific pathogen
 names. It is not a source row or a product. A context may contain several standardized BCA values and repeated
@@ -79,16 +81,16 @@ authorisation rows. We aggregate repeated rows into one context--BCA interaction
 counts as evidence. We evaluate the 109 complete contexts with at least two distinct observed BCAs, holding out one
 deterministic context--BCA edge from each. We remove the edge before
 building features, then rank the held-out BCA among the remaining candidate catalogue. For reproducibility, contexts
-are ordered by their scientific crop and pathogen names and the lexicographically last standardized BCA value is
-selected as the held-out edge. Unavailable targets are counted as misses; 107 of 109 inferred-only cases remain
-covered (98.2\%). We report results for all candidates and for an inferred-only view, which removes candidates that
+are ordered by their scientific crop and pathogen names and the alphabetically last standardized BCA value is
+selected as the held-out edge. Unavailable targets are counted as misses; 107 of 109 cases in the view of inferred candidates remain
+covered (98.2\%). We report results for all candidates and for a view of inferred candidates, which removes candidates that
 still have a known context match and corresponds to the query interface. The all-candidate hybrid result is reported
 below for completeness.
 
 We measure ranking quality with HitRate@1, HitRate@5, HitRate@10, mean reciprocal rank (MRR), and normalised
 discounted cumulative gain (NDCG), following standard cumulative-gain evaluation for ranked retrieval.
 We report candidate coverage separately because the ranker cannot recover a BCA
-that never appears elsewhere in the interaction catalogue in this warm start experiment. The baselines rank BCAs
+that never appears elsewhere in the interaction catalogue in this setting with existing catalogue evidence. The baselines rank BCAs
 by pathogen support and total support.
 
 This protocol tests retrieval of observed authorisation associations. It does not establish biological efficacy,

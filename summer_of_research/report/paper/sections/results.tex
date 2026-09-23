@@ -1,15 +1,16 @@
 \section{Results}\label{sec:results-and-project-outcomes}
 
-The four classifier metrics are $1.000$ on the grouped holdout. This reflects the strong separation between the
-pipeline-generated classes in the input record fields, as explained in Section~\ref{sec:evaluation-design}. It shows
-reproduction of the pipeline labels in this split, not independent biological validation or efficacy.
+The four classifier metrics are $1.000$ on the grouped held-out set. This reflects the strong separation between the
+pipeline-generated classes and the record fields that reveal BCA-related evidence, as explained in
+Section~\ref{sec:evaluation-design}. It shows reproduction of the pipeline labels in this split, not independent
+biological validation or efficacy.
 
-Table~\ref{tab:ranking-results} reports the inferred-only results. The variants are scoring ablations over the same
+Table~\ref{tab:ranking-results} reports results for inferred candidates. The variants are score comparisons over the same
 held-out cases, not different data splits. \textit{Hybrid} uses the full fixed weighted score, combining exact-context,
 context, pathogen, and collaborative support. \textit{Direct support} removes the collaborative component and uses
 only the direct authorisation signals. \textit{Collaborative} uses only the item-similarity score. \textit{Pathogen
     baseline} ranks candidates by pathogen-level support, while \textit{Total baseline} ranks them by support across all
-contexts. After each ranking, the inferred-only view removes candidates with an exact query-context match; this is why
+contexts. After each ranking, the view of inferred candidates removes candidates with an exact query-context match; this is why
 the table evaluates candidates that are supported by related evidence rather than already known for the queried pair.
 The table separates candidate recovery, measured by
 coverage and HitRate@k, from rank quality, measured by MRR and NDCG@10. Coverage is the fraction of queries in
@@ -17,7 +18,7 @@ which the held-out BCA remains in the candidate catalogue. HitRate@k is the frac
 the first $k$ positions. MRR rewards higher ranks, and NDCG@10 gives less weight to lower-ranked hits.
 
 \begin{table}[H]
-    \caption{Ranking results for the inferred only view ($n=109$ contexts). Higher is better for every metric.}
+    \caption{Ranking results for inferred candidates ($n=109$ contexts). Higher is better for every metric.}
     \label{tab:ranking-results}
     \centering
     \small
@@ -51,9 +52,9 @@ the first $k$ positions. MRR rewards higher ranks, and NDCG@10 gives less weight
 \end{table}
 
 In the all-candidate view, the hybrid ranker reaches 100.0\% coverage, 81.7\% Hit@5, and an MRR of 0.319. The
-inferred-only view is the user-facing analysis shown in Table~\ref{tab:ranking-results}.
+view of inferred candidates is the user-facing analysis shown in Table~\ref{tab:ranking-results}.
 
-The triage score is not included in the current ranking score. This keeps it available as transparent
+The screening score is not included in the current ranking score. This keeps it available as transparent
 evidence from the authorisation data while avoiding a ranking contribution that was not supported by the held out
 retrieval results. The results should therefore be read as recovery of associations present in the source data,
 not as evidence that one BCA is biologically superior to another.
